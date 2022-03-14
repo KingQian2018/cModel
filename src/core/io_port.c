@@ -1,0 +1,473 @@
+#include <stdlib.h> //< MDK
+#include <stdio.h>
+#include "io_port.h"
+
+#if CM_USE_LOG
+#define T(t) #t,
+static const char *_loginfo[] = {IOSTUS_ERROR};
+#define LOG_TAG "[IO PORT]"
+#undef T
+#include "cm_log.h"
+#else
+static const char *_loginfo[] = NULL;
+#endif
+
+/// IO引脚结构体
+typedef struct
+{
+	a_value **ppA;		//< 指向模拟量指针的指针
+	d_value **ppD;		//< 指向数字量指针的指针
+	unsigned char ANum; //< 模拟量数量
+	unsigned char DNum; //< 数字量数量
+} IOPort_t;
+
+/// IO模块结构体
+struct IO_t
+{
+	IOSTUS_e Flag; //< IO模块状态
+	char *pcName;  //< IO模块名字
+	IOPort_t I;	   //< IO模块输入引脚
+	IOPort_t O;	   //< IO模块输出引脚
+};
+
+/// 宏定义，判断是否为有效引脚
+#define IS_VALID_AI_PIN(io, p) (p <= IOPIN_8 || p < (io->I.ANum))
+#define IS_VALID_AO_PIN(io, p) (p <= IOPIN_8 || p < (io->O.DNum))
+#define IS_VALID_DI_PIN(io, p) (p <= IOPIN_8 || p < (io->I.ANum))
+#define IS_VALID_DO_PIN(io, p) (p <= IOPIN_8 || p < (io->O.DNum))
+
+/// 描述： IO模块 实例化
+/// 输入：
+///		IO* io					--- 指向IO模块的指针
+///		char* pName 			--- 指向IO模块名称的指针
+///		unsigned char Num[4]	--- IO引脚数量，分别对应AI, DI, AO, DO
+/// 返回： IOSTUS_e
+///		IOSTUS_OK	IO模块实例化成功
+/// 	IOSTUS_ERR	IO模块实例化失败。由于需要实例化的IO模块非空
+/// 	IOSTUS_FILE
+/// 		1. IO模块动态分配空间失败
+/// 		2. IO模块动态分配指向模拟量输入引脚空间失败
+/// 		3. IO模块动态分配指向数字量输入引脚空间失败
+/// 		4. IO模块动态分配指向模拟量输出引脚空间失败
+/// 		5. IO模块动态分配模拟量输出引脚空间失败
+/// 		6. IO模块动态分配指向数字量输出引脚空间失败
+/// 		7. IO模块动态分配数字量输出引脚空间失败
+/// 算法：
+/// 	1. 首先判断指向IO模块的指针是否为空
+/// 	2. 开辟新的IO模块
+/// 	3. 为新开辟的IO模块分配IO引脚个数以及名称
+/// 	4. 循环开辟指向输入引脚指针的指针
+/// 	5. 循环开辟指向输出引脚指针的指针以及输出引脚空间
+IOSTUS_e IO_Create(IO *io, char *pName, unsigned char Num[4])
+{
+	if (io[0] != 0)
+	{
+		LOG_E("IO io is Null!")
+		return IOSTUS_ERR;
+	}
+	io[0] = (IO)calloc(1, sizeof(struct IO_t));
+	if (io[0] == 0)
+	{
+		LOG_E("Create IO Filed!")
+		return IOSTUS_FILE;
+	}
+	io[0]->Flag = IOSTUS_DONE;
+
+	io[0]->I.ANum = Num[0];
+	io[0]->I.DNum = Num[1];
+	io[0]->O.ANum = Num[2];
+	io[0]->O.DNum = Num[3];
+	io[0]->pcName = pName;
+
+	io[0]->I.ppA = (io[0]->I.ANum != 0) ? (float **)calloc(io[0]->I.ANum, sizeof(float *)) : 0;
+	if ((io[0]->I.ppA == 0x0) && (io[0]->I.ANum != 0))
+	{
+		LOG_E("Init %s Model I.ppA Error!", io[0]->pcName);
+		free(io[0]);
+		io[0] = 0;
+		return IOSTUS_FILE;
+	}
+
+	io[0]->I.ppD = (io[0]->I.DNum != 0) ? (unsigned char **)calloc(io[0]->I.DNum, sizeof(unsigned char *)) : 0;
+	if ((io[0]->I.ppD == 0x0) && (io[0]->I.DNum != 0))
+	{
+		LOG_E("Init %s Model I.ppD Error!", io[0]->pcName);
+		free(io[0]->I.ppA);
+		free(io[0]);
+		io[0] = 0;
+		return IOSTUS_FILE;
+	}
+
+	io[0]->O.ppA = (io[0]->O.ANum != 0) ? (float **)calloc(io[0]->O.ANum, sizeof(float *)) : 0;
+	if ((io[0]->O.ppA == 0x0) && (io[0]->O.ANum != 0))
+	{
+		LOG_E("Init %s Model O.ppA Error!", io[0]->pcName);
+		free(io[0]->I.ppA);
+		free(io[0]->I.ppD);
+		free(io[0]);
+		io[0] = 0;
+		return IOSTUS_FILE;
+	}
+	for (unsigned char i = 0; i < io[0]->O.ANum; i++)
+	{
+		io[0]->O.ppA[i] = (float *)calloc(io[0]->O.ANum, sizeof(float));
+		if (io[0]->O.ppA[i] == 0x0)
+		{
+			LOG_E("Init %s Model O.ppA[%d] Error!", io[0]->pcName, i);
+			for (unsigned char j = 0; j < i; j++)
+			{
+				free(io[0]->O.ppA[j]);
+			}
+			free(io[0]->I.ppA);
+			free(io[0]->I.ppD);
+			free(io[0]);
+			io[0] = 0;
+			return IOSTUS_FILE;
+		}
+	}
+
+	io[0]->O.ppD = (io[0]->O.DNum != 0) ? (unsigned char **)calloc(io[0]->O.DNum, sizeof(unsigned char *)) : 0;
+	if ((io[0]->O.ppD == 0x0) && (io[0]->O.DNum != 0))
+	{
+		LOG_E("Init %s Model O.ppD Error!", io[0]->pcName);
+		free(io[0]->I.ppA);
+		free(io[0]->I.ppD);
+		free(io[0]->O.ppA);
+		free(io[0]);
+		io[0] = 0;
+		return IOSTUS_FILE;
+	}
+	for (unsigned char i = 0; i < io[0]->O.DNum; i++)
+	{
+		io[0]->O.ppD[i] = (unsigned char *)calloc(io[0]->O.DNum, sizeof(unsigned char));
+		if (io[0]->O.ppD[i] == 0x0)
+		{
+			LOG_E("Init %s Model O.ppD[%d] Error!", io[0]->pcName, i);
+			for (unsigned char j = 0; j < i; j++)
+			{
+				free(io[0]->O.ppD[j]);
+			}
+			for (unsigned char j = 0; j < io[0]->O.ANum; j++)
+			{
+				free(io[0]->O.ppA[j]);
+			}
+			free(io[0]->I.ppA);
+			free(io[0]->I.ppD);
+			free(io[0]->O.ppA);
+			free(io[0]);
+			io[0] = 0;
+			return IOSTUS_FILE;
+		}
+	}
+	return IOSTUS_OK;
+}
+
+/// 描述：IO模块输入引脚建立连接
+/// 输入：
+/// 	IO IO				--- IO模块指针
+/// 	const IOTYP_e Type	--- IO模块类型枚举量
+/// 	const IOPIN_e pin	--- IO模块引脚类型枚举量
+/// 	void *pValue		--- 指向变量的指针，注意此处其变量类型为空，在程序内部对其进行了处理
+/// 返回：  IOSTUS_e
+///		IOSTUS_OK	引脚建立成功
+/// 	IOSTUS_ERR
+/// 		1. 需要建立的引脚非 AI、DI 类型
+/// 		2. 需要建立的引脚数量越界
+IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
+{
+	unsigned char myLoca = (unsigned char)pin;
+	if (type == IOTYP_DI)
+	{
+		unsigned char *pD = (unsigned char *)pValue;
+		if (myLoca > io->I.DNum - 1)
+		{
+			LOG_E("[%s]'s DI max is %d, %d is out of range.", io->pcName, io->I.DNum - 1, myLoca);
+			return IOSTUS_ERR;
+		}
+		io->I.ppD[myLoca] = pD;
+	}
+	else if (type == IOTYP_AI)
+	{
+		float *pA = (float *)pValue;
+		if (myLoca > io->I.ANum - 1)
+		{
+			LOG_E("[%s]'s AI max is %d, %d is out of range.", io->pcName, io->I.ANum - 1, myLoca);
+			return IOSTUS_ERR;
+		}
+		io->I.ppA[myLoca] = pA;
+	}
+	else
+	{
+		LOG_E("IO Set Link Type Error.");
+		return IOSTUS_ERR;
+	}
+	return IOSTUS_OK;
+}
+
+/// 描述：获取模块模拟量数值
+/// 输入：
+/// 	IO IO			--- IO模块指针
+/// 	IOPIN_e Num		--- IO模块引脚类型枚举量
+/// 	IOTYP_e Type	--- IO模块类型枚举量
+///
+/// 返回：
+/// 	val		--- 对应模拟量引脚数值
+/// 		注意：当引脚越界或者非模拟量类型引脚时，返回为0
+float IO_GetAValue(IO io, IOPIN_e Num, IOTYP_e Type)
+{
+	float val = 0.0f;
+	if (Type == IOTYP_AI)
+	{
+		if (!IS_VALID_AI_PIN(io, Num))
+		{
+			LOG_W("Get [%s]'s AI[%d] is out of range [%d], and return 0.", io->pcName, Num, io->I.ANum - 1);
+			return val;
+		}
+		else
+		{
+			return (io->I.ppA[Num] == 0x00) ? val : io->I.ppA[Num][0];
+		}
+	}
+	else if (Type == IOTYP_AO)
+	{
+		if (!IS_VALID_AO_PIN(io, Num))
+		{
+			LOG_W("Get [%s]'s AO[%d] is out of range [%d], and return 0.", io->pcName, Num, io->O.ANum - 1);
+			return val;
+		}
+		else
+		{
+			return (io->O.ppA[Num] == 0x00) ? val : io->O.ppA[Num][0];
+		}
+	}
+	else
+	{
+		LOG_W("Get [%s]'s type error, and return 0.", io->pcName, Num, io->O.ANum - 1);
+		return val;
+	}
+}
+
+/// 描述：获取模块数字量数值
+/// 输入：
+/// 	IO IO			--- IO模块指针
+/// 	IOPIN_e Num		--- IO模块引脚类型枚举量
+/// 	IOTYP_e Type	--- IO模块类型枚举量
+///
+/// 返回：
+/// 	val		--- 对应数字量引脚数值
+/// 		注意：当引脚越界或者非数字量类型引脚时，返回为0
+unsigned char IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
+{
+	unsigned char val = 0;
+	if (type == IOTYP_DI)
+	{
+		if (!IS_VALID_AI_PIN(io, num))
+		{
+			LOG_W("Get [%s]'s DI[%d] is out of range [%d], and return 0.", io->pcName, Num, io->I.DNum - 1);
+			return val;
+		}
+		else
+		{
+			return (io->I.ppD[num] == 0x00) ? val : io->I.ppD[num][0];
+		}
+	}
+	else if (type == IOTYP_DO)
+	{
+		if (!IS_VALID_AO_PIN(io, num))
+		{
+			LOG_W("Get [%s]'s DO[%d] is out of range [%d], and return 0.", io->pcName, Num, io->O.DNum - 1);
+			return val;
+		}
+		else
+		{
+			return (io->O.ppD[num] == 0x00) ? val : io->O.ppD[num][0];
+		}
+	}
+	else
+	{
+		LOG_W("Get [%s]'s type error, and return 0.", io->pcName, Num, io->O.ANum - 1);
+		return val;
+	}
+}
+
+/// 描述：获取模块模拟量输出指针
+/// 输入：
+/// 	IO io			--- IO模块指针
+/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
+///
+/// 返回：
+/// 	对应模块模拟量输出指针
+/// 	注意：当引脚越界时，返回为0
+float *IO_GetAOPoint(IO io, IOPIN_e pin)
+{
+	if (!IS_VALID_AO_PIN(io, pin))
+	{
+		LOG_E("[%s] Out of range.", io->pcName);
+		return 0;
+	}
+	return io->O.ppA[pin];
+}
+
+/// 描述：获取模块数字量输出指针
+/// 输入：
+/// 	IO io			--- IO模块指针
+/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
+///
+/// 返回：
+/// 	对应模块数字量输出指针
+/// 	注意：当引脚越界时，返回为0
+unsigned char *IO_GetDOPoint(IO io, IOPIN_e pin)
+{
+	if (!IS_VALID_DO_PIN(io, pin))
+	{
+		LOG_E("[%s] Out of range.", io->pcName);
+		return 0;
+	}
+	return io->O.ppD[pin];
+}
+
+/// 描述：获取模块状态
+/// 输入：
+/// 	IO io			--- IO模块指针
+///
+/// 返回：
+/// 	模块状态
+IOSTUS_e IO_GetIOFlg(IO io)
+{
+	return io->Flag;
+}
+
+/// 描述：设置模块模拟量输出值
+/// 输入：
+/// 	IO io			--- IO模块指针
+/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
+/// 	float fVal		--- 输出值
+/// 返回：IOSTUS_e
+/// 	IOSTUS_OK	设置成功
+/// 	IOSTUS_ERR	设置出错。模拟量输出引脚越界
+IOSTUS_e IO_SetAOValue(IO IO, IOPIN_e pin, float fVal)
+{
+	if (!IS_VALID_AO_PIN(IO, pin))
+	{
+		LOG_E("[%s] Out of range.", io->pcName);
+		return IOSTUS_ERR;
+	}
+	IO->O.ppA[pin][0] = fVal;
+	return IOSTUS_OK;
+}
+
+/// 描述：设置模块数字量输出值
+/// 输入：
+/// 	IO io				--- IO模块指针
+/// 	IOPIN_e pin			--- IO模块引脚类型枚举量
+/// 	unsigned char ucVal	--- 输出值
+/// 返回：IOSTUS_e
+/// 	IOSTUS_OK	设置成功
+/// 	IOSTUS_ERR	设置出错。数字量输出引脚越界
+IOSTUS_e IO_SetDOValue(IO IO, IOPIN_e pin, unsigned char ucVal)
+{
+	if (!IS_VALID_DO_PIN(IO, pin))
+	{
+		LOG_E("[%s] Out of range.", io->pcName);
+		return IOSTUS_ERR;
+	}
+	IO->O.ppD[pin][0] = ucVal;
+	return IOSTUS_OK;
+}
+
+/// 描述：显示模块引脚数值
+void IO_ShowALL(IO IO)
+{
+	printf("\n\t======模块 %s AI-%d DI-%d AO-%d DO-%d======\n", IO->pcName, IO->I.ANum, IO->I.DNum, IO->O.ANum, IO->O.DNum);
+	for (unsigned char pin = 0; pin < IO->I.ANum; pin++)
+	{
+		printf("\t");
+		if (IO->I.ppA[pin] != 0)
+		{
+			printf("%.3f\t==>A%d\t\t", IO->I.ppA[pin][0], pin + 1);
+		}
+		else
+		{
+			printf("None\t==>A%d\t\t", pin + 1);
+		}
+		if (pin < IO->O.ANum)
+		{
+			printf("A%d==>\t%.3f", pin + 1, IO->O.ppA[pin][0]);
+		}
+		printf("\n");
+	}
+	for (unsigned char pin = 0; pin < IO->I.DNum; pin++)
+	{
+		printf("\t");
+		if (IO->I.ppD[pin] != 0)
+		{
+			printf("%d\t-->D%d\t\t", IO->I.ppD[pin][0], pin + 1);
+		}
+		else
+		{
+			printf("None\t-->D%d\t\t", pin + 1);
+		}
+		if (pin < IO->O.DNum)
+		{
+			printf("D%d-->\t%d", pin + 1, IO->O.ppD[pin][0]);
+		}
+		printf("\n");
+	}
+}
+
+/// 描述：显示模块指定引脚数值
+/// 输入：
+/// 	IO IO			--- IO模块指针
+/// 	IOTYP_e Type	--- IO模块类型枚举量
+/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
+void IO_ShowPin(IO IO, IOTYP_e Type, IOPIN_e pin)
+{
+	unsigned char myPinMax = 0;
+	unsigned char myPin = pin;
+	myPinMax = (Type == IOTYP_AI) ? IO->I.ANum - 1 : (Type == IOTYP_AO) ? IO->O.ANum - 1
+												 : (Type == IOTYP_DI)	? IO->I.DNum - 1
+												 : (Type == IOTYP_DO)	? IO->O.DNum - 1
+																		: IOTYP_RESE;
+
+	if (myPinMax == IOTYP_RESE)
+	{
+		printf("Model_IOShowPin Err: 模块 %s 显示类型 %d 错误\n", IO->pcName, Type);
+	}
+	if (pin > IOPIN_8 || pin > (IOPIN_e)myPinMax)
+	{
+		printf("Model_IOShowPin Err: 模块 %s 显示引脚 %d 超出范围\n", IO->pcName, (unsigned char)pin);
+		return;
+	}
+	printf("\n\t======模块 %s======\n\t", IO->pcName);
+	switch (Type)
+	{
+	case IOTYP_AI:
+		if (IO->I.ppA[myPin] != 0)
+		{
+			printf("%.3f\t==>A%d\t\t", IO->I.ppA[myPin][0], myPin + 1);
+		}
+		else
+		{
+			printf("None\t==>A%d\t\t", myPin + 1);
+		}
+		break;
+	case IOTYP_DI:
+		if (IO->I.ppD[myPin] != 0)
+		{
+			printf("%d\t-->D%d\t\t", IO->I.ppD[myPin][0], myPin + 1);
+		}
+		else
+		{
+			printf("None\t==>D%d\t\t", myPin + 1);
+		}
+		break;
+	case IOTYP_AO:
+		printf("A%d==>\t%.3f\n", myPin + 1, IO->O.ppA[myPin][0]);
+		break;
+	case IOTYP_DO:
+		printf("D%d-->\t%d\n", myPin + 1, IO->O.ppD[myPin][0]);
+		break;
+	default:
+		break;
+	}
+}
