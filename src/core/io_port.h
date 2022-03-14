@@ -46,6 +46,16 @@ extern "C"
 
 	typedef struct IO_t *IO; // IO模块指针
 
+	IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4]);
+	IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue);
+	a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e Type);
+	d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type);
+	IOSTUS_e IO_GetIOFlg(IO io);
+	IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, float fVal);
+	IOSTUS_e IO_SetDOValue(IO io, IOPIN_e pin, unsigned char ucVal);
+	void IO_ShowALL(IO io);
+	void IO_ShowPin(IO io, IOTYP_e Type, IOPIN_e pin);
+
 #ifdef __cplusplus
 }
 #endif

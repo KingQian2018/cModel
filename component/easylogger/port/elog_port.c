@@ -25,20 +25,21 @@
  * Function: Portable interface for each platform.
  * Created on: 2015-04-28
  */
- 
+
 #include <elog.h>
-#include "cm_hal_tick.h"
+#include <stdio.h>
 
 /**
  * EasyLogger port initialize
  *
  * @return result
  */
-ElogErrCode elog_port_init(void) {
+ElogErrCode elog_port_init(void)
+{
     ElogErrCode result = ELOG_NO_ERR;
 
     /* add your code here */
-    
+
     return result;
 }
 
@@ -46,10 +47,10 @@ ElogErrCode elog_port_init(void) {
  * EasyLogger port deinitialize
  *
  */
-void elog_port_deinit(void) {
+void elog_port_deinit(void)
+{
 
     /* add your code here */
-
 }
 
 /**
@@ -58,44 +59,45 @@ void elog_port_deinit(void) {
  * @param log output of log
  * @param size log size
  */
-void elog_port_output(const char *log, size_t size) {
-    
+void elog_port_output(const char *log, size_t size)
+{
+
     /* add your code here */
-    printf("%s",log);
-    
+    size_t i = 0;
+    while (i < size)
+    {
+        printf("%c", log[i++]);
+    }
 }
 
 /**
  * output lock
  */
-void elog_port_output_lock(void) {
-    
+void elog_port_output_lock(void)
+{
+
     /* add your code here */
-    
 }
 
 /**
  * output unlock
  */
-void elog_port_output_unlock(void) {
-    
+void elog_port_output_unlock(void)
+{
+
     /* add your code here */
-    
 }
 
-static char _now_time[11];
-#include <stdio.h>
 /**
  * get current time interface
  *
  * @return current time
  */
-const char *elog_port_get_time(void) {
-    
+const char *elog_port_get_time(void)
+{
+
     /* add your code here */
-    uint32_t time = cm_tick_get();
-    sprintf(_now_time,"%d",time);
-    return _now_time;
+    return "";
 }
 
 /**
@@ -103,10 +105,11 @@ const char *elog_port_get_time(void) {
  *
  * @return current process name
  */
-const char *elog_port_get_p_info(void) {
-    
+const char *elog_port_get_p_info(void)
+{
+
     /* add your code here */
-    return "pid:1010";    
+    return "pid:1010";
 }
 
 /**
@@ -114,8 +117,9 @@ const char *elog_port_get_p_info(void) {
  *
  * @return current thread name
  */
-const char *elog_port_get_t_info(void) {
-    
+const char *elog_port_get_t_info(void)
+{
+
     /* add your code here */
-    return "tid:10010";    
+    return "tid:10010";
 }

@@ -3,7 +3,7 @@
 
 #include "cmodel_conf.h"
 
-#if CM_USE_LOG 1
+#if CM_USE_LOG
 #include "elog.h"
 
 #define LOG_A log_a
