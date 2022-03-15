@@ -7,6 +7,9 @@
 extern "C"
 {
 #endif
+
+#define IS_VALID_IO(io) (IOSTUS_DONE == IO_GetIOFlg(io))
+
 	typedef enum
 	{
 		IOTYP_AI, // 模拟量输入
@@ -15,6 +18,12 @@ extern "C"
 		IOTYP_DO, // 数字量输出
 		IOTYP_RESE = 0xFF
 	} IOTYP_e; // IO类型枚举量
+
+	typedef enum
+	{
+		IO_ADTYPE_A, // 模拟量
+		IO_ADTYPE_D, // 数字量
+	} IO_ADTYPE_e;
 
 	typedef enum
 	{
@@ -70,11 +79,12 @@ extern "C"
 		InPort_t I;	   //< IO模块输入引脚
 		OutPort_t O;   //< IO模块输出引脚
 	};
-
 	IOSTUS_e IO_Create(IO *io, unsigned char num[4]);
 	IOSTUS_e IO_Deleate(IO io);
-	IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue);
+	IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue);
+	a_value *IO_GetAOPoint(IO io, IOPIN_e pin);
 	a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e Type);
+	d_value *IO_GetDOPoint(IO io, IOPIN_e pin);
 	d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type);
 	IOSTUS_e IO_GetIOFlg(IO io);
 	IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, float fVal);

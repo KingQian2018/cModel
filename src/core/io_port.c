@@ -136,7 +136,7 @@ IOSTUS_e IO_Deleate(IO io)
 /// 	IOSTUS_ERR
 /// 		1. 需要建立的引脚非 AI、DI 类型
 /// 		2. 需要建立的引脚数量越界
-IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
+IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 {
 	unsigned char myLoca = (unsigned char)pin;
 	if (type == IOTYP_DI)

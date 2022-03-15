@@ -19,6 +19,7 @@ extern "C"
     T(CM_FINDNONE)   \
     T(CM_TYPEERR)    \
     T(CM_CREATEPAR)  \
+    T(CM_IOINVALID)  \
     T(IO_ERR)
 
 #define T(typ) CMODEL_STATUS_##typ,

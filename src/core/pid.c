@@ -127,6 +127,39 @@ static uint32_t pid_run(CModel cm, uint32_t dt)
     par->sta.LastU = IO_GetAValue(cm->io, PID_AO_OUT, IOTYP_AO);
 }
 
+uint32_t pid_setLink(CModel cm, a_value *pPV, a_value *pSP, a_value *pFF, a_value *pTR, d_value *pSTR)
+{
+    if (!IS_VALID_IO(cm->io))
+    {
+        LOG_E("%s.", _loginfo[CMODEL_STATUS_CM_IOINVALID]);
+        return CMODEL_STATUS_CM_IOINVALID;
+    }
+    IO_setLink(cm->io, IOTYP_AI, IOPIN_1, pPV);
+    IO_setLink(cm->io, IOTYP_AI, IOPIN_2, pSP);
+    IO_setLink(cm->io, IOTYP_AI, IOPIN_3, pFF);
+    IO_setLink(cm->io, IOTYP_AI, IOPIN_4, pTR);
+    IO_setLink(cm->io, IOTYP_DI, IOPIN_1, pSTR);
+    return CMODEL_STATUS_OK;
+}
+
+a_value PID_AOut(CModel cm)
+{
+    if (!IS_VALID_IO(cm->io))
+    {
+        return 0.0f;
+    }
+    return IO_GetAValue(cm->io, PID_AO_OUT, IOTYP_AO);
+}
+
+a_value *PID_AOutPoint(CModel cm)
+{
+    if (!IS_VALID_IO(cm->io))
+    {
+        return 0;
+    }
+    return IO_GetAOPoint(cm->io, PID_AO_OUT);
+}
+
 uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt)
 {
     uint8_t num[4] = {4, 1, 1, 0};

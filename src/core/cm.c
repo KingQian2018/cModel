@@ -97,3 +97,8 @@ uint32_t cm_run(unsigned int dt)
     }
     return CMODEL_STATUS_OK;
 }
+
+uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
+{
+    IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
+}
