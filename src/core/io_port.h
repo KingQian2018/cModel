@@ -46,7 +46,33 @@ extern "C"
 
 	typedef struct IO_t *IO; // IO模块指针
 
-	IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4]);
+	/// IO引脚结构体
+	typedef struct
+	{
+		a_value **ppA;		//< 指向模拟量指针的指针
+		d_value **ppD;		//< 指向数字量指针的指针
+		unsigned char ANum; //< 模拟量数量
+		unsigned char DNum; //< 数字量数量
+	} InPort_t;
+
+	typedef struct
+	{
+		a_value *pA;		//< 指向模拟量指针的指针
+		d_value *pD;		//< 指向数字量指针的指针
+		unsigned char ANum; //< 模拟量数量
+		unsigned char DNum; //< 数字量数量
+	} OutPort_t;
+
+	/// IO模块结构体
+	struct IO_t
+	{
+		IOSTUS_e Flag; //< IO模块状态
+		InPort_t I;	   //< IO模块输入引脚
+		OutPort_t O;   //< IO模块输出引脚
+	};
+
+	IOSTUS_e IO_Create(IO *io, unsigned char num[4]);
+	IOSTUS_e IO_Deleate(IO io);
 	IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue);
 	a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e Type);
 	d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type);

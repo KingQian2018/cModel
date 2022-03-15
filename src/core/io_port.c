@@ -12,32 +12,6 @@ static const char *_loginfo[] = {IOSTUS_ERROR};
 static const char *_loginfo[] = NULL;
 #endif
 
-/// IO引脚结构体
-typedef struct
-{
-	a_value **ppA;		//< 指向模拟量指针的指针
-	d_value **ppD;		//< 指向数字量指针的指针
-	unsigned char ANum; //< 模拟量数量
-	unsigned char DNum; //< 数字量数量
-} InPort_t;
-
-typedef struct
-{
-	a_value *pA;		//< 指向模拟量指针的指针
-	d_value *pD;		//< 指向数字量指针的指针
-	unsigned char ANum; //< 模拟量数量
-	unsigned char DNum; //< 数字量数量
-} OutPort_t;
-
-/// IO模块结构体
-struct IO_t
-{
-	IOSTUS_e Flag;		//< IO模块状态
-	const char *pcName; //< IO模块名字
-	InPort_t I;			//< IO模块输入引脚
-	OutPort_t O;		//< IO模块输出引脚
-};
-
 /// 宏定义，判断是否为有效引脚
 #define IS_VALID_AI_PIN(io, p) (p < (io->I.ANum) && p <= IOPIN_8)
 #define IS_VALID_AO_PIN(io, p) (p < (io->O.DNum) && p <= IOPIN_8)
@@ -66,7 +40,7 @@ struct IO_t
 /// 	3. 为新开辟的IO模块分配IO引脚个数以及名称
 /// 	4. 循环开辟指向输入引脚指针的指针
 /// 	5. 循环开辟指向输出引脚指针的指针以及输出引脚空间
-IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4])
+IOSTUS_e IO_Create(IO *io, unsigned char num[4])
 {
 	if (io[0] != 0)
 	{
@@ -85,12 +59,11 @@ IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4])
 	io[0]->I.DNum = num[1];
 	io[0]->O.ANum = num[2];
 	io[0]->O.DNum = num[3];
-	io[0]->pcName = pName;
 
 	io[0]->I.ppA = (io[0]->I.ANum != 0) ? (float **)calloc(io[0]->I.ANum, sizeof(float *)) : 0;
 	if ((io[0]->I.ppA == 0x0) && (io[0]->I.ANum != 0))
 	{
-		LOG_E("Init %s Model I.ppA Error!", io[0]->pcName);
+		LOG_E("Init I.ppA Error!");
 		free(io[0]);
 		io[0] = 0;
 		return IOSTUS_FILE;
@@ -99,7 +72,7 @@ IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4])
 	io[0]->I.ppD = (io[0]->I.DNum != 0) ? (d_value **)calloc(io[0]->I.DNum, sizeof(d_value *)) : 0;
 	if ((io[0]->I.ppD == 0x0) && (io[0]->I.DNum != 0))
 	{
-		LOG_E("Init %s Model I.ppD Error!", io[0]->pcName);
+		LOG_E("Init I.ppD Error!");
 		free(io[0]->I.ppA);
 		free(io[0]);
 		io[0] = 0;
@@ -109,7 +82,7 @@ IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4])
 	io[0]->O.pA = (io[0]->O.ANum != 0) ? (a_value *)calloc(io[0]->O.ANum, sizeof(a_value)) : 0;
 	if ((io[0]->O.pA == 0x0) && (io[0]->O.ANum != 0))
 	{
-		LOG_E("Init %s Model O.pA Error!", io[0]->pcName);
+		LOG_E("Init O.pA Error!");
 		free(io[0]->I.ppA);
 		free(io[0]->I.ppD);
 		free(io[0]);
@@ -117,10 +90,10 @@ IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4])
 		return IOSTUS_FILE;
 	}
 
-	io[0]->O.pD = (io[0]->O.DNum != 0) ? (d_value **)calloc(io[0]->O.DNum, sizeof(d_value *)) : 0;
+	io[0]->O.pD = (io[0]->O.DNum != 0) ? (d_value *)calloc(io[0]->O.DNum, sizeof(d_value)) : 0;
 	if ((io[0]->O.pD == 0x0) && (io[0]->O.DNum != 0))
 	{
-		LOG_E("Init %s Model O.pD Error!", io[0]->pcName);
+		LOG_E("Init O.pD Error!");
 		free(io[0]->I.ppA);
 		free(io[0]->I.ppD);
 		free(io[0]->O.pA);
@@ -128,6 +101,27 @@ IOSTUS_e IO_Create(IO *io, const char *pName, unsigned char num[4])
 		io[0] = 0;
 		return IOSTUS_FILE;
 	}
+	return IOSTUS_OK;
+}
+
+/**
+ * @brief 删除非空IO模块
+ *
+ * @param io
+ * @return IOSTUS_e
+ */
+IOSTUS_e IO_Deleate(IO io)
+{
+	if (io == NULL)
+	{
+		return IOSTUS_OK;
+	}
+	free(io->I.ppA);
+	free(io->I.ppD);
+	free(io->O.pA);
+	free(io->O.pD);
+	free(io);
+	io = NULL;
 	return IOSTUS_OK;
 }
 
@@ -150,7 +144,7 @@ IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 		unsigned char *pD = (unsigned char *)pValue;
 		if (myLoca > io->I.DNum - 1)
 		{
-			LOG_E("Model: %s's DI max is %d, %d is out of range.", io->pcName, io->I.DNum - 1, myLoca);
+			LOG_E("DI max is %d, %d is out of range.", io->I.DNum - 1, myLoca);
 			return IOSTUS_ERR;
 		}
 		io->I.ppD[myLoca] = pD;
@@ -160,7 +154,7 @@ IOSTUS_e IO_SetLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 		float *pA = (float *)pValue;
 		if (myLoca > io->I.ANum - 1)
 		{
-			LOG_E("Model: %s's AI max is %d, %d is out of range.", io->pcName, io->I.ANum - 1, myLoca);
+			LOG_E("AI max is %d, %d is out of range.", io->I.ANum - 1, myLoca);
 			return IOSTUS_ERR;
 		}
 		io->I.ppA[myLoca] = pA;
@@ -189,7 +183,7 @@ a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e type)
 	{
 		if (!IS_VALID_AI_PIN(io, num))
 		{
-			LOG_W("Get Model: %s's AI[%d] is out of range [%d], and return 0.", io->pcName, num, io->I.ANum - 1);
+			LOG_W("Get AI[%d] is out of range [%d], and return 0.", num, io->I.ANum - 1);
 			return val;
 		}
 		else
@@ -201,7 +195,7 @@ a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e type)
 	{
 		if (!IS_VALID_AO_PIN(io, num))
 		{
-			LOG_W("Get Model: %s's AO[%d] is out of range [%d], and return 0.", io->pcName, num, io->O.ANum - 1);
+			LOG_W("Get AO[%d] is out of range [%d], and return 0.", num, io->O.ANum - 1);
 			return val;
 		}
 		else
@@ -211,7 +205,7 @@ a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e type)
 	}
 	else
 	{
-		LOG_W("Get Model: %s's type error, and return 0.", io->pcName, num, io->O.ANum - 1);
+		LOG_W("Get type error, and return 0.", num, io->O.ANum - 1);
 		return val;
 	}
 }
@@ -232,7 +226,7 @@ d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
 	{
 		if (!IS_VALID_AI_PIN(io, num))
 		{
-			LOG_W("Get Model: %s's DI[%d] is out of range [%d], and return 0.", io->pcName, num, io->I.DNum - 1);
+			LOG_W("Get DI[%d] is out of range [%d], and return 0.", num, io->I.DNum - 1);
 			return val;
 		}
 		else
@@ -244,7 +238,7 @@ d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
 	{
 		if (!IS_VALID_AO_PIN(io, num))
 		{
-			LOG_W("Get Model: %s's DO[%d] is out of range [%d], and return 0.", io->pcName, num, io->O.DNum - 1);
+			LOG_W("Get DO[%d] is out of range [%d], and return 0.", num, io->O.DNum - 1);
 			return val;
 		}
 		else
@@ -254,7 +248,7 @@ d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
 	}
 	else
 	{
-		LOG_W("Get Model: %s's type error, and return 0.", io->pcName, num, io->O.ANum - 1);
+		LOG_W("Get type error, and return 0.", num, io->O.ANum - 1);
 		return val;
 	}
 }
@@ -271,7 +265,7 @@ a_value *IO_GetAOPoint(IO io, IOPIN_e pin)
 {
 	if (!IS_VALID_AO_PIN(io, pin))
 	{
-		LOG_E("Model: %s Out of range.", io->pcName);
+		LOG_E("Model: %s Out of range.");
 		return 0;
 	}
 	return &(io->O.pA[pin]);
@@ -289,10 +283,10 @@ d_value *IO_GetDOPoint(IO io, IOPIN_e pin)
 {
 	if (!IS_VALID_DO_PIN(io, pin))
 	{
-		LOG_E("Model: %s Out of range.", io->pcName);
+		LOG_E("Model: %s Out of range.");
 		return 0;
 	}
-	return io->O.pD[pin];
+	return &io->O.pD[pin];
 }
 
 /// 描述：获取模块状态
@@ -318,7 +312,7 @@ IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
 {
 	if (!IS_VALID_AO_PIN(io, pin))
 	{
-		LOG_E("Model: %s Out of range.", io->pcName);
+		LOG_E("Model: %s Out of range.");
 		return IOSTUS_ERR;
 	}
 	io->O.pA[pin] = fVal;
@@ -337,7 +331,7 @@ IOSTUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
 {
 	if (!IS_VALID_DO_PIN(io, pin))
 	{
-		LOG_E("Model: %s Out of range.", io->pcName);
+		LOG_E("Model: %s Out of range.");
 		return IOSTUS_ERR;
 	}
 	io->O.pD[pin] = ucVal;
@@ -347,7 +341,7 @@ IOSTUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
 /// 描述：显示模块引脚数值
 void IO_ShowALL(IO io)
 {
-	printf("\n\t======Model %s AI-%d DI-%d AO-%d DO-%d======\n", io->pcName, io->I.ANum, io->I.DNum, io->O.ANum, io->O.DNum);
+	printf("\n\t======Model AI-%d DI-%d AO-%d DO-%d======\n", io->I.ANum, io->I.DNum, io->O.ANum, io->O.DNum);
 	for (unsigned char pin = 0; pin < io->I.ANum; pin++)
 	{
 		printf("\t");
@@ -400,14 +394,14 @@ void IO_ShowPin(IO io, IOTYP_e type, IOPIN_e pin)
 
 	if (myPinMax == IOTYP_RESE)
 	{
-		LOG_E("Search %s's Show type %d Error.", io->pcName, myPinMax);
+		LOG_E("Show type %d Error.", myPinMax);
 	}
 	if (pin > IOPIN_8 || pin > (IOPIN_e)myPinMax)
 	{
-		LOG_E("Search %s's %d IOis out of range.", io->pcName, (unsigned char)pin);
+		LOG_E("Search %d IO is out of range.", (unsigned char)pin);
 		return;
 	}
-	printf("\n\t======Model %s======\n\t", io->pcName);
+	printf("\n\t======IO======\n\t");
 	switch (type)
 	{
 	case IOTYP_AI:
