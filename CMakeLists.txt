@@ -12,6 +12,7 @@ set(EASYLOGGER_INC
 set(SEC_INC
     ./
     ./src/
+    ./src/algo/
     ./src/core/
     ./src/hal/
     ./src/misc/

@@ -31,6 +31,8 @@ extern "C"
 
 #define CMODEL_TYPE \
     T(NONE)         \
+    T(CONST)        \
+    T(TRANSLATE)    \
     T(PID)
 #define T(typ) CMODEL_##typ,
     typedef enum
@@ -38,6 +40,13 @@ extern "C"
         CMODEL_TYPE
     } CMODEL_TYPE_e;
 #undef T
+
+#define IS_VALID_TYPE(cm, typ)           \
+    if (cm == NULL || cm->type != typ)   \
+    {                                    \
+        LOG_E("TYPEERR.");               \
+        return CMODEL_STATUS_CM_TYPEERR; \
+    }
 
     typedef void *Par_t;
     typedef void *Fun_t;
@@ -67,8 +76,13 @@ extern "C"
     };
 
     uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8_t num[4]);
+    uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst);
     uint32_t cm_deleate(CModel *cm);
     uint32_t cm_run(unsigned int dt);
+    uint32_t cm_showAll(CModel cm);
+    uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin);
+    a_value cm_getAPin(CModel cm, IOPIN_e pin, IOTYP_e type);
+    d_value cm_getDPin(CModel cm, IOPIN_e pin, IOTYP_e type);
 
 #ifdef __cplusplus
 }

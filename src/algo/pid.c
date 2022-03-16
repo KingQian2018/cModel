@@ -1,5 +1,7 @@
 #include "pid.h"
 
+#if CM_PID
+
 #if CM_LOG_PID
 #define LOG_TAG "PID"
 #define T(t) #t,
@@ -32,44 +34,35 @@ typedef struct
 /// 模块状态结构体
 typedef struct
 {
-    float Err[3]; // 偏差值。用于存放k, k-1, k-2时刻的历史偏差
-    float Dt;     // 模块运行的基准时间间隔
-    float LastI;  // 历史积分值
-    float LastU;  // 历史输出值
-    float LastKP; // 历史比例增益
+    a_value Err[3]; // 偏差值。用于存放k, k-1, k-2时刻的历史偏差
+    a_value LastI;  // 历史积分值
+    a_value LastU;  // 历史输出值
+    a_value LastKP; // 历史比例增益
 } PIDSta_t;
 
 /// 模块参数结构体
 typedef struct
 {
-    float KP;     // 比例增益
-    float KI;     // 积分增益
-    float KD;     // 微分增益
-    PIDAdj_t SP;  // 设定值
-    PIDAdj_t PV;  // 过程量
-    float HigOut; // 输出上限
-    float LowOut; // 输出下限
-    PIDSta_t sta; // 运行状态
+    a_value KP;     // 比例增益
+    a_value KI;     // 积分增益
+    a_value KD;     // 微分增益
+    PIDAdj_t SP;    // 设定值
+    PIDAdj_t PV;    // 过程量
+    a_value HigOut; // 输出上限
+    a_value LowOut; // 输出下限
+    PIDSta_t sta;   // 运行状态
 } PIDPar_t;
 
 static uint32_t pid_del(CModel cm)
 {
-    if (cm->type != CMODEL_PID)
-    {
-        LOG_E("Delete PID Model Error.");
-        return CMODEL_STATUS_CM_TYPEERR;
-    }
+    IS_VALID_TYPE(cm, CMODEL_PID);
     free(cm->par);
     return CMODEL_STATUS_OK;
 }
 
 static uint32_t pid_run(CModel cm, uint32_t dt)
 {
-    if (cm == NULL)
-    {
-        LOG_E("pid run model is null.");
-        return CMODEL_STATUS_CM_NULL;
-    }
+    IS_VALID_TYPE(cm, CMODEL_PID);
 
     PIDPar_t *par = (PIDPar_t *)cm->par;
     struct
@@ -96,8 +89,8 @@ static uint32_t pid_run(CModel cm, uint32_t dt)
     else
     {
         Out.P = par->KP * par->sta.Err[0];
-        Out.I = par->KI * par->sta.Err[0] * par->sta.Dt + par->sta.LastI;
-        Out.D = par->KD * (par->sta.Err[0] - par->sta.Err[1]) / par->sta.Dt;
+        Out.I = par->KI * par->sta.Err[0] * dt + par->sta.LastI;
+        Out.D = par->KD * (par->sta.Err[0] - par->sta.Err[1]) / dt;
 
         /// 积分输出
         Out.I = (Out.I > par->HigOut) ? par->HigOut : (Out.I < par->LowOut) ? par->LowOut
@@ -125,39 +118,7 @@ static uint32_t pid_run(CModel cm, uint32_t dt)
     par->sta.Err[1] = par->sta.Err[0];
     par->sta.LastI = Out.I;
     par->sta.LastU = IO_GetAValue(cm->io, PID_AO_OUT, IOTYP_AO);
-}
-
-uint32_t pid_setLink(CModel cm, a_value *pPV, a_value *pSP, a_value *pFF, a_value *pTR, d_value *pSTR)
-{
-    if (!IS_VALID_IO(cm->io))
-    {
-        LOG_E("%s.", _loginfo[CMODEL_STATUS_CM_IOINVALID]);
-        return CMODEL_STATUS_CM_IOINVALID;
-    }
-    IO_setLink(cm->io, IOTYP_AI, IOPIN_1, pPV);
-    IO_setLink(cm->io, IOTYP_AI, IOPIN_2, pSP);
-    IO_setLink(cm->io, IOTYP_AI, IOPIN_3, pFF);
-    IO_setLink(cm->io, IOTYP_AI, IOPIN_4, pTR);
-    IO_setLink(cm->io, IOTYP_DI, IOPIN_1, pSTR);
     return CMODEL_STATUS_OK;
-}
-
-a_value PID_AOut(CModel cm)
-{
-    if (!IS_VALID_IO(cm->io))
-    {
-        return 0.0f;
-    }
-    return IO_GetAValue(cm->io, PID_AO_OUT, IOTYP_AO);
-}
-
-a_value *PID_AOutPoint(CModel cm)
-{
-    if (!IS_VALID_IO(cm->io))
-    {
-        return 0;
-    }
-    return IO_GetAOPoint(cm->io, PID_AO_OUT);
 }
 
 uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt)
@@ -176,7 +137,59 @@ uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt)
         LOG_E("PID %d Create Par Error.", id);
         return CMODEL_STATUS_CM_CREATEPAR;
     }
+
+    PIDPar_t *par = (PIDPar_t *)cm[0]->par;
+    par->HigOut = 100;
+    par->LowOut = -100;
+    par->KP = par->KI = par->KD = 0;
+    par->SP.Basis = par->PV.Basis = 0;
+    par->SP.Gain = par->PV.Gain = 1;
+    par->sta.Err[0] = par->sta.Err[1] = par->sta.Err[2] = 0;
+    par->sta.LastI = par->sta.LastKP = par->sta.LastU = 0;
+
     cm[0]->deleateByCM = pid_del;
     cm[0]->run = pid_run;
     return CMODEL_STATUS_OK;
 }
+
+uint32_t pid_setPID(CModel cm, float p, float i, float d)
+{
+    IS_VALID_TYPE(cm, CMODEL_PID);
+    PIDPar_t *par = cm->par;
+    par->KP = p;
+    par->KI = i;
+    par->KD = d;
+    return CMODEL_STATUS_OK;
+}
+
+static uint32_t _pid_setSPPV(CModel cm, unsigned char sp_pv, float basis, float gain)
+{
+    IS_VALID_TYPE(cm, CMODEL_PID);
+    PIDPar_t *par = cm->par;
+    PIDAdj_t *adj = (sp_pv == 1) ? &par->PV : &par->SP;
+    adj->Basis = basis;
+    adj->Gain = gain;
+    return CMODEL_STATUS_OK;
+}
+
+uint32_t pid_setSP(CModel cm, float basis, float gain) { return _pid_setSPPV(cm, 0, basis, gain); }
+
+uint32_t pid_setPV(CModel cm, float basis, float gain) { return _pid_setSPPV(cm, 1, basis, gain); }
+
+uint32_t pid_setLimit(CModel cm, float h, float l)
+{
+    IS_VALID_TYPE(cm, CMODEL_PID);
+    PIDPar_t *par = cm->par;
+    par->HigOut = h;
+    par->LowOut = l;
+    return CMODEL_STATUS_OK;
+}
+
+uint32_t pid_setDt(CModel cm, uint32_t dt)
+{
+    IS_VALID_TYPE(cm, CMODEL_PID);
+    cm->dt = dt;
+    return CMODEL_STATUS_OK;
+}
+
+#endif

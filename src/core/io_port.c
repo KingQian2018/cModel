@@ -13,10 +13,10 @@ static const char *_loginfo[] = NULL;
 #endif
 
 /// 宏定义，判断是否为有效引脚
-#define IS_VALID_AI_PIN(io, p) (p < (io->I.ANum) && p <= IOPIN_8)
-#define IS_VALID_AO_PIN(io, p) (p < (io->O.DNum) && p <= IOPIN_8)
-#define IS_VALID_DI_PIN(io, p) (p < (io->I.ANum) && p <= IOPIN_8)
-#define IS_VALID_DO_PIN(io, p) (p < (io->O.DNum) && p <= IOPIN_8)
+#define IS_VALID_AI_PIN(io, p) (p <= (io->I.ANum) && p <= IOPIN_8)
+#define IS_VALID_AO_PIN(io, p) (p <= (io->O.DNum) && p <= IOPIN_8)
+#define IS_VALID_DI_PIN(io, p) (p <= (io->I.ANum) && p <= IOPIN_8)
+#define IS_VALID_DO_PIN(io, p) (p <= (io->O.DNum) && p <= IOPIN_8)
 
 /// 描述： IO模块 实例化
 /// 输入：

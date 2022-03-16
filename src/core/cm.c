@@ -87,7 +87,7 @@ uint32_t cm_run(unsigned int dt)
     {
         return CMODEL_STATUS_OK;
     }
-    while (tmp[0]->next != NULL)
+    while (tmp[0] != NULL)
     {
         if (tmp[0]->run != 0)
         {
@@ -101,4 +101,50 @@ uint32_t cm_run(unsigned int dt)
 uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
 {
     IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
+    return CMODEL_STATUS_OK;
+}
+
+#include <stdio.h>
+uint32_t cm_showAll(CModel cm)
+{
+    if (cm == NULL)
+    {
+        LOG_E("CM_NULL.");
+        return CMODEL_STATUS_CM_NULL;
+    }
+    printf("\n%d\t%s", cm->id, cm->name);
+    IO_ShowALL(cm->io);
+    return CMODEL_STATUS_OK;
+}
+
+uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin)
+{
+    if (cm == NULL)
+    {
+        LOG_E("CM_NULL.");
+        return CMODEL_STATUS_CM_NULL;
+    }
+    printf("\n%d\t%s", cm->id, cm->name);
+    IO_ShowPin(cm->io, type, pin);
+    return CMODEL_STATUS_OK;
+}
+
+a_value cm_getAPin(CModel cm, IOPIN_e pin, IOTYP_e type)
+{
+    if (cm == NULL)
+    {
+        LOG_E("CM_NULL.");
+        return 0;
+    }
+    return IO_GetAValue(cm->io, pin, type);
+}
+
+d_value cm_getDPin(CModel cm, IOPIN_e pin, IOTYP_e type)
+{
+    if (cm == NULL)
+    {
+        LOG_E("CM_NULL.");
+        return 0;
+    }
+    return IO_GetDValue(cm->io, pin, type);
 }
