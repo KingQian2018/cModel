@@ -77,6 +77,7 @@ static uint32_t pid_run(CModel cm, uint32_t dt)
     a_value myFF = IO_GetAValue(cm->io, PID_AI_FF, IOTYP_AI);
     a_value myTR = IO_GetAValue(cm->io, PID_AI_TR, IOTYP_AI);
     d_value myStr = IO_GetDValue(cm->io, PID_DI_STR, IOTYP_DI);
+    float Dt = dt / 1000.0f;
 
     mySP = (mySP - par->SP.Basis) * par->SP.Gain;
     myPV = (myPV - par->PV.Basis) * par->PV.Gain;
@@ -89,8 +90,8 @@ static uint32_t pid_run(CModel cm, uint32_t dt)
     else
     {
         Out.P = par->KP * par->sta.Err[0];
-        Out.I = par->KI * par->sta.Err[0] * dt + par->sta.LastI;
-        Out.D = par->KD * (par->sta.Err[0] - par->sta.Err[1]) / dt;
+        Out.I = par->KI * par->sta.Err[0] * Dt + par->sta.LastI;
+        Out.D = par->KD * (par->sta.Err[0] - par->sta.Err[1]) / Dt;
 
         /// 积分输出
         Out.I = (Out.I > par->HigOut) ? par->HigOut : (Out.I < par->LowOut) ? par->LowOut
