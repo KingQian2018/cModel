@@ -20,6 +20,7 @@
 #define CM_PID 1
 #define CM_CONST 1
 #define CM_TRANSLATE 1
+#define CM_LIMIT 1
 
 #define CM_SPRINTF_USE_FLOAT 1
 

@@ -4,7 +4,9 @@ set(SRC_C
     ./algo/pid.c
     ./algo/const.c
     ./algo/translate.c
+    ./algo/limit.c
     ./hal/cm_hal_tick.c
+    ./test/test_limit.c
 )
 
 include_directories(

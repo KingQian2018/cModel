@@ -8,10 +8,10 @@
 #define T(t) #t,
 static const char *_loginfo[] = {CMODEL_ERROR};
 #undef T
-#include "cm_log.h"
 #else
 static const char *_loginfo[] = NULL;
 #endif
+#include "cm_log.h"
 
 const static char *name = "TRANSLATE";
 
@@ -110,6 +110,13 @@ uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
 	return CMODEL_STATUS_OK;
 }
 
+/**
+ * @param cm		模型
+ * @param K			增益
+ * @param T			时间常数。单位 S
+ * @param n			阶次
+ * @param Tao 		纯延时。单位 S
+ */
 uint32_t translate_setPar(CModel cm, float K, uint32_t T, short n, float Tao)
 {
 	IS_VALID_TYPE(cm, CMODEL_TRANSLATE);

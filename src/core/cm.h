@@ -33,6 +33,7 @@ extern "C"
     T(NONE)         \
     T(CONST)        \
     T(TRANSLATE)    \
+    T(LIMIT)        \
     T(PID)
 #define T(typ) CMODEL_##typ,
     typedef enum

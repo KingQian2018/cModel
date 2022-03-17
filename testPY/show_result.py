@@ -26,5 +26,6 @@ for r in rs:
 for d in datas:
     pyplot.plot(d)
     
+pyplot.grid(True)
 pyplot.show()
 pass

@@ -84,15 +84,21 @@ void _model_setLink(void)
     cm_setLink(IOTYP_AI, m_pid_2, IOPIN_2, m_pid_1, IOPIN_1);       // sp1
     cm_setLink(IOTYP_AI, m_pid_2, IOPIN_1, m_translate_1, IOPIN_1); // pv2
 
-    cm_setLink(IOTYP_AI, m_translate_1, IOPIN_1, m_pid_2, IOPIN_1); // obj
+    cm_setLink(IOTYP_AI, m_translate_1, IOPIN_1, m_pid_2, IOPIN_1);       // obj
     cm_setLink(IOTYP_AI, m_translate_2, IOPIN_1, m_translate_1, IOPIN_1); // obj
 }
 
-#define SHOW_ITEMS (5)
-#define SHOW_NUMBER (50000)
+#define SHOW_ITEMS (2)
+#define SHOW_NUMBER (5000)
 a_value temp[SHOW_ITEMS][SHOW_NUMBER];
 #include <stdio.h>
 #include <string.h>
+
+extern void test_limit(void);
+extern void test_limit_change(a_value v);
+extern CModel _m_const_2;
+extern CModel _m_limit_1;
+
 int main(void)
 {
     elog_init();
@@ -105,9 +111,10 @@ int main(void)
     elog_start();
 
     // _iotest();
-    _model_create();
-    _model_set();
-    _model_setLink();
+    // _model_create();
+    // _model_set();
+    // _model_setLink();
+    test_limit();
 
     FILE *f;
     f = fopen("D:/Users/KisWang/Documents/kw_cModel/testPY/out.txt", "w");
@@ -116,15 +123,13 @@ int main(void)
     while (count < SHOW_NUMBER)
     {
         cm_run(1);
-        if (count == 500)
+        if (count == SHOW_NUMBER / 2)
         {
             // const_setValue(m_const_1, -5.0f);
+            test_limit_change(-200);
         }
-        temp[0][count] = cm_getAPin(m_const_1, IOPIN_1, IOTYP_AO);
-        temp[1][count] = cm_getAPin(m_pid_1, IOPIN_1, IOTYP_AO);
-        temp[2][count] = cm_getAPin(m_translate_1, IOPIN_1, IOTYP_AO);
-        temp[3][count] = cm_getAPin(m_pid_2, IOPIN_1, IOTYP_AO);
-        temp[4][count] = cm_getAPin(m_translate_2, IOPIN_1, IOTYP_AO);
+        temp[0][count] = cm_getAPin(_m_const_2, IOPIN_1, IOTYP_AO);
+        temp[1][count] = cm_getAPin(_m_limit_1, IOPIN_1, IOTYP_AO);
         count++;
     }
     for (uint32_t m = 0; m < SHOW_ITEMS; m++)

@@ -7,10 +7,10 @@
 #define T(t) #t,
 static const char *_loginfo[] = {CMODEL_ERROR};
 #undef T
-#include "cm_log.h"
 #else
 static const char *_loginfo[] = NULL;
 #endif
+#include "cm_log.h"
 
 const static char *name = "PID";
 
