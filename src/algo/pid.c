@@ -4,11 +4,6 @@
 
 #if CM_LOG_PID
 #define LOG_TAG "PID"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = NULL;
 #endif
 #include "cm_log.h"
 
@@ -53,14 +48,7 @@ typedef struct
     PIDSta_t sta;   // 运行状态
 } PIDPar_t;
 
-static uint32_t pid_del(CModel cm)
-{
-    IS_VALID_TYPE(cm, CMODEL_PID);
-    free(cm->par);
-    return CMODEL_STATUS_OK;
-}
-
-static uint32_t pid_run(CModel cm, uint32_t dt)
+static uint32_t _run(CModel cm, uint32_t dt)
 {
     IS_VALID_TYPE(cm, CMODEL_PID);
 
@@ -148,8 +136,8 @@ uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt)
     par->sta.Err[0] = par->sta.Err[1] = par->sta.Err[2] = 0;
     par->sta.LastI = par->sta.LastKP = par->sta.LastU = 0;
 
-    cm[0]->deleateByCM = pid_del;
-    cm[0]->run = pid_run;
+    cm[0]->deleateByCM = cm_commonDeleatePar;
+    cm[0]->run = _run;
     return CMODEL_STATUS_OK;
 }
 

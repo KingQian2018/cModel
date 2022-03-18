@@ -34,6 +34,7 @@ extern "C"
     T(CONST)        \
     T(TRANSLATE)    \
     T(LIMIT)        \
+    T(SWITCH)       \
     T(PID)
 #define T(typ) CMODEL_##typ,
     typedef enum
@@ -41,6 +42,8 @@ extern "C"
         CMODEL_TYPE
     } CMODEL_TYPE_e;
 #undef T
+
+    extern const char *_loginfo[];
 
 #define IS_VALID_TYPE(cm, typ)           \
     if (cm == NULL || cm->type != typ)   \
@@ -79,6 +82,7 @@ extern "C"
     uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8_t num[4]);
     uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst);
     uint32_t cm_deleate(CModel *cm);
+    uint32_t cm_commonDeleatePar(CModel cm);
     uint32_t cm_run(unsigned int dt);
     uint32_t cm_showAll(CModel cm);
     uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin);

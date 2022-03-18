@@ -5,11 +5,6 @@
 
 #if CM_LOG_TRANSLATE
 #define LOG_TAG "TRANSLATE"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = NULL;
 #endif
 #include "cm_log.h"
 
@@ -105,7 +100,7 @@ uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
 	par->sta.a = expf(-((float)cm[0]->dt / 1000.0f) / (float)par->T);
 	par->sta.b = 1 - par->sta.a;
 
-	cm[0]->deleateByCM = _del;
+	cm[0]->deleateByCM = cm_commonDeleatePar;
 	cm[0]->run = _run;
 	return CMODEL_STATUS_OK;
 }

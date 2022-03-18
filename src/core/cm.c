@@ -4,12 +4,12 @@
 #if CM_LOG_CM
 #define T(t) #t,
 #define LOG_TAG "CModel"
-static const char *_loginfo[] = {CMODEL_ERROR};
+const char *_loginfo[] = {CMODEL_ERROR};
 #undef T
-#include "cm_log.h"
 #else
-static const char *_loginfo[] = NULL;
+const char *_loginfo[] = {NULL};
 #endif
+#include "cm_log.h"
 
 static CModel _register;
 static const char *_name = "CMODEL";
@@ -80,6 +80,12 @@ uint32_t cm_deleate(CModel *cm)
     return CMODEL_STATUS_OK;
 }
 
+uint32_t cm_commonDeleatePar(CModel cm)
+{
+    free(cm->par);
+    return CMODEL_STATUS_OK;
+}
+
 uint32_t cm_run(unsigned int dt)
 {
     CModel *tmp = &_register;
@@ -100,7 +106,14 @@ uint32_t cm_run(unsigned int dt)
 
 uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
 {
-    IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
+    if (type == IOTYP_AI)
+    {
+        IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
+    }
+    else
+    {
+        IO_setLink(cmSrc->io, type, pinSrc, IO_GetDOPoint(cmDst->io, pinDst));
+    }
     return CMODEL_STATUS_OK;
 }
 

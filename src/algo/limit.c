@@ -4,11 +4,6 @@
 
 #if CM_LOG_LIMIT
 #define LOG_TAG "LIMIT"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = {NULL};
 #endif
 #include "cm_log.h"
 
@@ -41,23 +36,21 @@ static uint32_t _run(CModel cm, uint32_t dt)
     a_value ain_1 = IO_GetAValue(cm->io, IOPIN_1, IOTYP_AI);
     d_value din_1 = IO_GetDValue(cm->io, IOPIN_1, IOTYP_DI);
     d_value din_2 = IO_GetDValue(cm->io, IOPIN_2, IOTYP_DI);
-    if (din_1)
-    {
-        par->lstU = par->lstU > par->highOut  ? par->highOut
-                    : par->lstU < par->lowOut ? par->lowOut
-                                              : par->lstU;
-    }
+    a_value target = (!din_1)               ? ain_1
+                     : ain_1 > par->highOut ? par->highOut
+                     : ain_1 < par->lowOut  ? par->lowOut
+                                            : ain_1;
     if (din_2)
     {
-        a_value dlt = (ain_1 - par->lstU);
+        a_value dlt = (target - par->lstU);
         a_value speed = par->speed / 1000.0f * dt;
         par->lstU = speed < dlt    ? par->lstU + speed
                     : -speed > dlt ? par->lstU - speed
                                    : par->lstU + dlt;
     }
-    if (!din_2 && !din_1)
+    else
     {
-        par->lstU = ain_1;
+        par->lstU = target;
     }
     IO_SetAOValue(cm->io, IOPIN_1, par->lstU);
     return CMODEL_STATUS_OK;
@@ -87,7 +80,7 @@ uint32_t limit_create(CModel *cm, uint32_t id, uint32_t dt)
     par->speed = 0;
     par->lstU = 0;
 
-    cm[0]->deleateByCM = _del;
+    cm[0]->deleateByCM = cm_commonDeleatePar;
     cm[0]->run = _run;
     return CMODEL_STATUS_OK;
 }

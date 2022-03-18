@@ -5,6 +5,7 @@ set(SRC_C
     ./algo/const.c
     ./algo/translate.c
     ./algo/limit.c
+    ./algo/switch.c
     ./hal/cm_hal_tick.c
     ./test/test_limit.c
 )

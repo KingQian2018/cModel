@@ -4,11 +4,6 @@
 
 #if CM_LOG_CONST
 #define LOG_TAG "CONST"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = NULL;
 #endif
 #include "cm_log.h"
 
@@ -16,7 +11,7 @@ const static char *name = "CONST";
 
 typedef struct _ConstPar_s
 {
-	uint32_t targetT; // 跳变时间
+	uint32_t triggleT; // 跳变时间
 	uint32_t lstT;	  // 上次时间
 	a_value value;	  // 设定值
 } ConstPar_s;
@@ -38,7 +33,7 @@ static uint32_t _run(CModel cm, uint32_t dt)
 
 	ConstPar_s *par = (ConstPar_s *)cm->par;
 	par->lstT += dt;
-	if (par->lstT > par->targetT)
+	if (par->lstT > par->triggleT)
 	{
 		IO_SetAOValue(cm->io, IOPIN_1, par->value);
 	}
@@ -62,10 +57,10 @@ uint32_t const_create(CModel *cm, uint32_t id, uint32_t dt)
 	}
 
 	ConstPar_s *par = (ConstPar_s *)cm[0]->par;
-	par->lstT = par->targetT = 0;
+	par->lstT = par->triggleT = 0;
 	par->value = 1;
 	
-	cm[0]->deleateByCM = _del;
+	cm[0]->deleateByCM = cm_commonDeleatePar;
 	cm[0]->run = _run;
 	return CMODEL_STATUS_OK;
 }
@@ -74,7 +69,7 @@ uint32_t const_setTargetT(CModel cm, uint32_t tT)
 {
 	IS_VALID_TYPE(cm, CMODEL_CONST);
 	ConstPar_s *par = (ConstPar_s *)cm->par;
-	par->targetT = tT;
+	par->triggleT = tT;
 	return CMODEL_STATUS_OK;
 }
 

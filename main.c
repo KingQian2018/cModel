@@ -88,7 +88,7 @@ void _model_setLink(void)
     cm_setLink(IOTYP_AI, m_translate_2, IOPIN_1, m_translate_1, IOPIN_1); // obj
 }
 
-#define SHOW_ITEMS (2)
+#define SHOW_ITEMS (4)
 #define SHOW_NUMBER (5000)
 a_value temp[SHOW_ITEMS][SHOW_NUMBER];
 #include <stdio.h>
@@ -96,8 +96,12 @@ a_value temp[SHOW_ITEMS][SHOW_NUMBER];
 
 extern void test_limit(void);
 extern void test_limit_change(a_value v);
+extern void test_switch1_toggle(uint32_t triT);
+extern void test_switch2_toggle(uint32_t triT);
 extern CModel _m_const_2;
 extern CModel _m_limit_1;
+extern CModel _m_switch_1;
+extern CModel _m_switch_2;
 
 int main(void)
 {
@@ -123,6 +127,16 @@ int main(void)
     while (count < SHOW_NUMBER)
     {
         cm_run(1);
+        if (count == SHOW_NUMBER / 10)
+        {
+            test_switch1_toggle(0);
+            test_switch2_toggle(100);
+        }
+        else if (count == SHOW_NUMBER / 5)
+        {
+            test_switch1_toggle(0);
+        }
+
         if (count == SHOW_NUMBER / 2)
         {
             // const_setValue(m_const_1, -5.0f);
@@ -130,6 +144,8 @@ int main(void)
         }
         temp[0][count] = cm_getAPin(_m_const_2, IOPIN_1, IOTYP_AO);
         temp[1][count] = cm_getAPin(_m_limit_1, IOPIN_1, IOTYP_AO);
+        temp[2][count] = cm_getDPin(_m_switch_1, IOPIN_1, IOTYP_DO) * 10;
+        temp[3][count] = cm_getDPin(_m_switch_2, IOPIN_1, IOTYP_DO) * 10;
         count++;
     }
     for (uint32_t m = 0; m < SHOW_ITEMS; m++)
