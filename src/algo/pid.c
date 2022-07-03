@@ -8,7 +8,7 @@
 static const char *_loginfo[] = {CMODEL_ERROR};
 #undef T
 #else
-static const char *_loginfo[] = NULL;
+static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 

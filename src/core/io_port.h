@@ -47,7 +47,7 @@ extern "C"
 	T(RESE)
 
 #define T(t) IOSTUS_##t,
-	typedef enum
+	typedef enum _IOSTUS_e
 	{
 		IOSTUS_ERROR
 	} IOSTUS_e; // IO状态枚举量

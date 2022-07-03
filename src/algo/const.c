@@ -8,7 +8,7 @@
 static const char *_loginfo[] = {CMODEL_ERROR};
 #undef T
 #else
-static const char *_loginfo[] = NULL;
+static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 
@@ -50,14 +50,14 @@ uint32_t const_create(CModel *cm, uint32_t id, uint32_t dt)
 	cm_create(cm, name, id, dt, num);
 	if (cm[0] == NULL)
 	{
-		LOG_E("PID %d Create Error.", id);
+		LOG_E("CONST %d Create Error.", id);
 		return CMODEL_STATUS_CM_CREATE;
 	}
 	cm[0]->type = CMODEL_CONST;
 	cm[0]->par = (ConstPar_s *)calloc(1, sizeof(ConstPar_s));
 	if (cm[0]->par == NULL)
 	{
-		LOG_E("PID %d Create Par Error.", id);
+		LOG_E("CONST %d Create Par Error.", id);
 		return CMODEL_STATUS_CM_CREATEPAR;
 	}
 

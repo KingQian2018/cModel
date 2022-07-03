@@ -13,12 +13,12 @@
 #define LOG_D log_d
 #define LOG_V log_v
 #else
-#define LOG_A (void(0))
-#define LOG_E (void(0))
-#define LOG_W (void(0))
-#define LOG_I (void(0))
-#define LOG_D (void(0))
-#define LOG_V (void(0))
+#define LOG_A (void)
+#define LOG_E (void)
+#define LOG_W (void)
+#define LOG_I (void)
+#define LOG_D (void)
+#define LOG_V (void)
 #endif
 
 #endif

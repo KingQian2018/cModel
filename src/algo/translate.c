@@ -9,7 +9,7 @@
 static const char *_loginfo[] = {CMODEL_ERROR};
 #undef T
 #else
-static const char *_loginfo[] = NULL;
+static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 
@@ -116,6 +116,9 @@ uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
  * @param T			时间常数。单位 S
  * @param n			阶次
  * @param Tao 		纯延时。单位 S
+ * @return 
+ * 		CMODEL_STATUS_OK 成功
+ * 		CMODEL_STATUS_CM_CREATEPAR 中间状态参数创建失败 
  */
 uint32_t translate_setPar(CModel cm, float K, uint32_t T, short n, float Tao)
 {

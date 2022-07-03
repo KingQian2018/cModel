@@ -1,3 +1,13 @@
+/**
+ * @file io_port.c
+ * @author KisWang (KingQian2018)
+ * @brief 引脚核心
+ * @version 0.1
+ * @date 2022-07-03
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <stdlib.h> //< MDK
 #include <stdio.h>
 #include "io_port.h"
@@ -7,10 +17,10 @@
 static const char *_loginfo[] = {IOSTUS_ERROR};
 #define LOG_TAG "IO PORT"
 #undef T
-#include "cm_log.h"
 #else
-static const char *_loginfo[] = NULL;
+static const char *_loginfo[] = {};
 #endif
+#include "cm_log.h"
 
 /// 宏定义，判断是否为有效引脚
 #define IS_VALID_AI_PIN(io, p) (p <= (io->I.ANum) && p <= IOPIN_8)
@@ -18,28 +28,28 @@ static const char *_loginfo[] = NULL;
 #define IS_VALID_DI_PIN(io, p) (p <= (io->I.ANum) && p <= IOPIN_8)
 #define IS_VALID_DO_PIN(io, p) (p <= (io->O.DNum) && p <= IOPIN_8)
 
-/// 描述： IO模块 实例化
-/// 输入：
-///		IO* io					--- 指向IO模块的指针
-///		char* pName 			--- 指向IO模块名称的指针
-///		unsigned char num[4]	--- IO引脚数量，分别对应AI, DI, AO, DO
-/// 返回： IOSTUS_e
-///		IOSTUS_OK	IO模块实例化成功
-/// 	IOSTUS_ERR	IO模块实例化失败。由于需要实例化的IO模块非空
-/// 	IOSTUS_FILE
-/// 		1. IO模块动态分配空间失败
-/// 		2. IO模块动态分配指向模拟量输入引脚空间失败
-/// 		3. IO模块动态分配指向数字量输入引脚空间失败
-/// 		4. IO模块动态分配指向模拟量输出引脚空间失败
-/// 		5. IO模块动态分配模拟量输出引脚空间失败
-/// 		6. IO模块动态分配指向数字量输出引脚空间失败
-/// 		7. IO模块动态分配数字量输出引脚空间失败
-/// 算法：
-/// 	1. 首先判断指向IO模块的指针是否为空
-/// 	2. 开辟新的IO模块
-/// 	3. 为新开辟的IO模块分配IO引脚个数以及名称
-/// 	4. 循环开辟指向输入引脚指针的指针
-/// 	5. 循环开辟指向输出引脚指针的指针以及输出引脚空间
+/**
+ * @brief IO模块 实例化
+ * 
+ * @param io 指向IO模块的指针
+ * @param num IO引脚数量，分别对应AI, DI, AO, DO
+ * @return IOSTUS_OK	IO模块实例化成功 
+ * @return IOSTUS_ERR	IO模块实例化失败。由于需要实例化的IO模块非空
+ * @return IOSTUS_FILE
+ * 			1. IO模块动态分配空间失败
+ * 			2. IO模块动态分配指向模拟量输入引脚空间失败
+ * 			3. IO模块动态分配指向数字量输入引脚空间失败
+ * 			4. IO模块动态分配指向模拟量输出引脚空间失败
+ * 			5. IO模块动态分配模拟量输出引脚空间失败
+ * 			6. IO模块动态分配指向数字量输出引脚空间失败
+ * 			7. IO模块动态分配数字量输出引脚空间失败
+ * @details
+ * 			1. 首先判断指向IO模块的指针是否为空
+ * 			2. 开辟新的IO模块
+ * 			3. 为新开辟的IO模块分配IO引脚个数以及名称
+ * 			4. 循环开辟指向输入引脚指针的指针
+ * 			5. 循环开辟指向输出引脚指针的指针以及输出引脚空间
+ */
 IOSTUS_e IO_Create(IO *io, unsigned char num[4])
 {
 	if (io[0] != 0)
@@ -125,17 +135,18 @@ IOSTUS_e IO_Deleate(IO io)
 	return IOSTUS_OK;
 }
 
-/// 描述：IO模块输入引脚建立连接
-/// 输入：
-/// 	IO IO				--- IO模块指针
-/// 	const IOTYP_e type	--- IO模块类型枚举量
-/// 	const IOPIN_e pin	--- IO模块引脚类型枚举量
-/// 	void *pValue		--- 指向变量的指针，注意此处其变量类型为空，在程序内部对其进行了处理
-/// 返回：  IOSTUS_e
-///		IOSTUS_OK	引脚建立成功
-/// 	IOSTUS_ERR
-/// 		1. 需要建立的引脚非 AI、DI 类型
-/// 		2. 需要建立的引脚数量越界
+/**
+ * @brief IO模块输入引脚建立连接
+ * 
+ * @param io IO模块指针
+ * @param type IO模块类型枚举量
+ * @param pin IO模块引脚类型枚举量
+ * @param pValue 指向变量的指针，注意此处其变量类型为空，在程序内部对其进行了处理
+ * @return IOSTUS_OK	引脚建立成功 
+ * @return IOSTUS_ERR
+ * 		1. 需要建立的引脚非 AI、DI 类型
+ * 		2. 需要建立的引脚数量越界
+ */
 IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 {
 	unsigned char myLoca = (unsigned char)pin;
@@ -167,15 +178,15 @@ IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 	return IOSTUS_OK;
 }
 
-/// 描述：获取模块模拟量数值
-/// 输入：
-/// 	IO IO			--- IO模块指针
-/// 	IOPIN_e num		--- IO模块引脚类型枚举量
-/// 	IOTYP_e type	--- IO模块类型枚举量
-///
-/// 返回：
-/// 	val		--- 对应模拟量引脚数值
-/// 		注意：当引脚越界或者非模拟量类型引脚时，返回为0
+/**
+ * @brief 获取模块模拟量数值
+ * 
+ * @param io IO模块指针
+ * @param num IO模块引脚类型枚举量
+ * @param type IO模块类型枚举量
+ * @return a_value 对应模拟量引脚数值
+ * @note 当引脚越界或者非模拟量类型引脚时，返回为0
+ */
 a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e type)
 {
 	a_value val = 0.0f;
@@ -210,15 +221,15 @@ a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e type)
 	}
 }
 
-/// 描述：获取模块数字量数值
-/// 输入：
-/// 	IO IO			--- IO模块指针
-/// 	IOPIN_e num		--- IO模块引脚类型枚举量
-/// 	IOTYP_e type	--- IO模块类型枚举量
-///
-/// 返回：
-/// 	val		--- 对应数字量引脚数值
-/// 		注意：当引脚越界或者非数字量类型引脚时，返回为0
+/**
+ * @brief 获取模块数字量数值
+ * 
+ * @param io IO模块指针
+ * @param num IO模块引脚类型枚举量
+ * @param type IO模块类型枚举量
+ * @return d_value 对应数字量引脚数值
+ * @note 当引脚越界或者非数字量类型引脚时，返回为0
+ */
 d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
 {
 	d_value val = 0;
@@ -253,14 +264,14 @@ d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
 	}
 }
 
-/// 描述：获取模块模拟量输出指针
-/// 输入：
-/// 	IO io			--- IO模块指针
-/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
-///
-/// 返回：
-/// 	对应模块模拟量输出指针
-/// 	注意：当引脚越界时，返回为0
+/**
+ * @brief 获取模块模拟量输出指针
+ * 
+ * @param io IO模块指针
+ * @param pin IO模块引脚类型枚举量
+ * @return a_value* 对应模块模拟量输出指针
+ * @note 当引脚越界时，返回为0
+ */
 a_value *IO_GetAOPoint(IO io, IOPIN_e pin)
 {
 	if (!IS_VALID_AO_PIN(io, pin))
@@ -271,14 +282,14 @@ a_value *IO_GetAOPoint(IO io, IOPIN_e pin)
 	return &(io->O.pA[pin]);
 }
 
-/// 描述：获取模块数字量输出指针
-/// 输入：
-/// 	IO io			--- IO模块指针
-/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
-///
-/// 返回：
-/// 	对应模块数字量输出指针
-/// 	注意：当引脚越界时，返回为0
+/**
+ * @brief 获取模块数字量输出指针
+ * 
+ * @param io IO模块指针
+ * @param pin IO模块引脚类型枚举量
+ * @return d_value* 对应模块数字量输出指针
+ * @note 当引脚越界时，返回为0
+ */
 d_value *IO_GetDOPoint(IO io, IOPIN_e pin)
 {
 	if (!IS_VALID_DO_PIN(io, pin))
@@ -289,25 +300,26 @@ d_value *IO_GetDOPoint(IO io, IOPIN_e pin)
 	return &io->O.pD[pin];
 }
 
-/// 描述：获取模块状态
-/// 输入：
-/// 	IO io			--- IO模块指针
-///
-/// 返回：
-/// 	模块状态
+/**
+ * @brief 描述：获取模块状态
+ * 
+ * @param io IO模块指针
+ * @return IOSTUS_e 模块状态
+ */
 IOSTUS_e IO_GetIOFlg(IO io)
 {
 	return io->Flag;
 }
 
-/// 描述：设置模块模拟量输出值
-/// 输入：
-/// 	IO io			--- IO模块指针
-/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
-/// 	a_value fVal	--- 输出值
-/// 返回：IOSTUS_e
-/// 	IOSTUS_OK	设置成功
-/// 	IOSTUS_ERR	设置出错。模拟量输出引脚越界
+/**
+ * @brief 设置模块模拟量输出值
+ * 
+ * @param io IO模块指针
+ * @param pin IO模块引脚类型枚举量
+ * @param fVal 输出值
+ * @return IOSTUS_OK	设置成功 
+ * @return IOSTUS_ERR	设置出错。模拟量输出引脚越界
+ */
 IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
 {
 	if (!IS_VALID_AO_PIN(io, pin))
@@ -319,14 +331,15 @@ IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
 	return IOSTUS_OK;
 }
 
-/// 描述：设置模块数字量输出值
-/// 输入：
-/// 	IO io				--- IO模块指针
-/// 	IOPIN_e pin			--- IO模块引脚类型枚举量
-/// 	d_value ucVal		--- 输出值
-/// 返回：IOSTUS_e
-/// 	IOSTUS_OK	设置成功
-/// 	IOSTUS_ERR	设置出错。数字量输出引脚越界
+/**
+ * @brief 设置模块数字量输出值
+ * 
+ * @param io IO模块指针
+ * @param pin IO模块引脚类型枚举量
+ * @param ucVal 输出值
+ * @return IOSTUS_OK	设置成功
+ * @return IOSTUS_ERR	设置出错。数字量输出引脚越界
+ */
 IOSTUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
 {
 	if (!IS_VALID_DO_PIN(io, pin))
@@ -338,7 +351,11 @@ IOSTUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
 	return IOSTUS_OK;
 }
 
-/// 描述：显示模块引脚数值
+/**
+ * @brief 显示模块引脚数值
+ * 
+ * @param io 引脚
+ */
 void IO_ShowALL(IO io)
 {
 	printf("\n\t======Model AI-%d DI-%d AO-%d DO-%d======\n", io->I.ANum, io->I.DNum, io->O.ANum, io->O.DNum);
@@ -378,11 +395,13 @@ void IO_ShowALL(IO io)
 	}
 }
 
-/// 描述：显示模块指定引脚数值
-/// 输入：
-/// 	IO IO			--- IO模块指针
-/// 	IOTYP_e type	--- IO模块类型枚举量
-/// 	IOPIN_e pin		--- IO模块引脚类型枚举量
+/**
+ * @brief 显示模块指定引脚数值
+ * 
+ * @param io IO模块指针
+ * @param type IO模块类型枚举量
+ * @param pin IO模块引脚类型枚举量
+ */
 void IO_ShowPin(IO io, IOTYP_e type, IOPIN_e pin)
 {
 	unsigned char myPinMax = 0;
