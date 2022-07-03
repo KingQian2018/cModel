@@ -21,10 +21,10 @@ set(SEC_INC
 include_directories(${EASYLOGGER_INC} ${SEC_INC})
 
 add_subdirectory(component/easylogger/)
+add_subdirectory(component/cJson/)
 add_subdirectory(src/)
 
-set(LIBS lib_src)
-
+set(LIBS lib_src lib_cjson)
 add_custom_target(check
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure)
 

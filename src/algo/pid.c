@@ -1,14 +1,8 @@
 #include "pid.h"
 
 #if CM_PID
-
 #if CM_LOG_PID
 #define LOG_TAG "PID"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 

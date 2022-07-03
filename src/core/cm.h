@@ -11,24 +11,6 @@ extern "C"
 #include <stdint.h>
 #include <stdlib.h>
 
-#define CMODEL_ERROR \
-    T(OK)            \
-    T(CM_NULL)       \
-    T(CM_NOTNULL)    \
-    T(CM_CREATE)     \
-    T(CM_FINDNONE)   \
-    T(CM_TYPEERR)    \
-    T(CM_CREATEPAR)  \
-    T(CM_IOINVALID)  \
-    T(IO_ERR)
-
-#define T(typ) CMODEL_STATUS_##typ,
-    typedef enum
-    {
-        CMODEL_ERROR
-    } CMODEL_STATUS_e;
-#undef T
-
 #define CMODEL_TYPE \
     T(NONE)         \
     T(CONST)        \
@@ -53,20 +35,20 @@ extern "C"
     typedef void *Fun_t;
     typedef void *UserData_t;
     typedef struct _CModel_s CModel_s, *CModel;
-    typedef uint32_t (*Init_CB)(CModel cm);
-    typedef uint32_t (*Run_CB)(CModel cm, uint32_t dt);
-    typedef uint32_t (*DeleateByCM_CB)(CModel cm);
-    typedef uint32_t (*User_CB)(void *);
+    typedef CMODEL_STATUS_e (*Init_CB)(CModel cm);
+    typedef CMODEL_STATUS_e (*Run_CB)(CModel cm, CMODEL_STATUS_e dt);
+    typedef CMODEL_STATUS_e (*DeleateByCM_CB)(CModel cm);
+    typedef CMODEL_STATUS_e (*User_CB)(void *);
 
     struct _CModel_s
     {
         CModel pre;
         CModel next;
         const char *name;           // 模块名称
-        uint32_t id;                // 唯一标识符
+        CMODEL_STATUS_e id;                // 唯一标识符
         IO io;                      // io 引脚
         CMODEL_TYPE_e type;         // 模块类型
-        uint32_t dt;                // 运行时间间隔
+        CMODEL_STATUS_e dt;                // 运行时间间隔
         Init_CB init;               // 初始化
         Run_CB run;                 // 运行
         DeleateByCM_CB deleateByCM; // 删除
@@ -76,12 +58,12 @@ extern "C"
         User_CB user_cb;            // 用户回调
     };
 
-    uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8_t num[4]);
-    uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst);
-    uint32_t cm_deleate(CModel *cm);
-    uint32_t cm_run(unsigned int dt);
-    uint32_t cm_showAll(CModel cm);
-    uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin);
+    CMODEL_STATUS_e cm_create(CModel *cm, const char *name, CMODEL_STATUS_e id, CMODEL_STATUS_e dt, uint8_t num[4]);
+    CMODEL_STATUS_e cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst);
+    CMODEL_STATUS_e cm_deleate(CModel *cm);
+    CMODEL_STATUS_e cm_run(unsigned int dt);
+    CMODEL_STATUS_e cm_showAll(CModel cm);
+    CMODEL_STATUS_e cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin);
     a_value cm_getAPin(CModel cm, IOPIN_e pin, IOTYP_e type);
     d_value cm_getDPin(CModel cm, IOPIN_e pin, IOTYP_e type);
 

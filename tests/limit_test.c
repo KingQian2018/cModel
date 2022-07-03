@@ -1,10 +1,3 @@
-
-#include <stdio.h>
-
-#include "Unity/src/unity_internals.h"
-#include "Unity/examples/unity_config.h"
-#include "unity/src/unity.h"
-
 #include "common.h"
 
 CModel _m_const_2;

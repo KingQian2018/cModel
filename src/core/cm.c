@@ -11,12 +11,7 @@
 #include "cm.h"
 
 #if CM_LOG_CM
-#define T(t) #t,
 #define LOG_TAG "CModel"
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 
@@ -36,7 +31,7 @@ static const char *_name = "CMODEL";
  * @return CMODEL_STATUS_IO_ERR cm模块引脚创建失败 
  * @return CMODEL_STATUS_OK cm模块创建成功 
  */
-uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8_t num[4])
+CMODEL_STATUS_e cm_create(CModel *cm, const char *name, CMODEL_STATUS_e id, CMODEL_STATUS_e dt, uint8_t num[4])
 {
     if (cm[0] != NULL)
     {
@@ -52,7 +47,7 @@ uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8
     cm[0]->name = name == NULL ? _name : name;
     cm[0]->id = id;
     cm[0]->dt = dt;
-    if (IO_Create(&(cm[0]->io), num) != IOSTUS_OK)
+    if (IO_Create(&(cm[0]->io), num) != CMODEL_STATUS_OK)
     {
         LOG_E("%s create IO error.", name);
         return CMODEL_STATUS_IO_ERR;
@@ -79,7 +74,7 @@ uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8
  * @param cm 删除模块
  * @return CMODEL_STATUS_OK 删除成功 
  */
-uint32_t cm_deleate(CModel *cm)
+CMODEL_STATUS_e cm_deleate(CModel *cm)
 {
     CModel pre = cm[0]->pre;
     CModel next = cm[0]->next;
@@ -115,7 +110,7 @@ uint32_t cm_deleate(CModel *cm)
  * @param dt 运行时间间隔
  * @return CMODEL_STATUS_OK 运行成功 
  */
-uint32_t cm_run(unsigned int dt)
+CMODEL_STATUS_e cm_run(unsigned int dt)
 {
     CModel *tmp = &_register;
     if (tmp[0] == NULL)
@@ -144,9 +139,9 @@ uint32_t cm_run(unsigned int dt)
  * @return CMODEL_STATUS_OK 建立成功 
  * @return CMODEL_STATUS_IO_ERR 建立失败 
  */
-uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
+CMODEL_STATUS_e cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
 {
-    return IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst)) == IOSTUS_OK ? CMODEL_STATUS_OK : CMODEL_STATUS_IO_ERR;
+    return IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
 }
 
 #include <stdio.h>
@@ -157,7 +152,7 @@ uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IO
  * @return CMODEL_STATUS_CM_NULL 模块空 
  * @return CMODEL_STATUS_OK 成功 
  */
-uint32_t cm_showAll(CModel cm)
+CMODEL_STATUS_e cm_showAll(CModel cm)
 {
     if (cm == NULL)
     {
@@ -178,7 +173,7 @@ uint32_t cm_showAll(CModel cm)
  * @return CMODEL_STATUS_CM_NULL 模块空 
  * @return CMODEL_STATUS_OK 成功 
  */
-uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin)
+CMODEL_STATUS_e cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin)
 {
     if (cm == NULL)
     {

@@ -4,11 +4,6 @@
 
 #if CM_LOG_CONST
 #define LOG_TAG "CONST"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 

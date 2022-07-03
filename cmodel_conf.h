@@ -9,6 +9,7 @@
 #define CM_LOG_PID 1
 #define CM_LOG_CONST 1
 #define CM_LOG_TRANSLATE 1
+#define CM_LOG_PARSE 1
 #else
 #define CM_LOG_IO 0
 #define CM_LOG_CM 0

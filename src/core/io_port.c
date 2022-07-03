@@ -13,12 +13,7 @@
 #include "io_port.h"
 
 #if CM_USE_LOG
-#define T(t) #t,
-static const char *_loginfo[] = {IOSTUS_ERROR};
 #define LOG_TAG "IO PORT"
-#undef T
-#else
-static const char *_loginfo[] = {};
 #endif
 #include "cm_log.h"
 
@@ -33,9 +28,9 @@ static const char *_loginfo[] = {};
  * 
  * @param io 指向IO模块的指针
  * @param num IO引脚数量，分别对应AI, DI, AO, DO
- * @return IOSTUS_OK	IO模块实例化成功 
- * @return IOSTUS_ERR	IO模块实例化失败。由于需要实例化的IO模块非空
- * @return IOSTUS_FILE
+ * @return CMODEL_STATUS_OK	IO模块实例化成功 
+ * @return CMODEL_STATUS_IO_ERR	IO模块实例化失败。由于需要实例化的IO模块非空
+ * @return CMODEL_STATUS_IO_FILE
  * 			1. IO模块动态分配空间失败
  * 			2. IO模块动态分配指向模拟量输入引脚空间失败
  * 			3. IO模块动态分配指向数字量输入引脚空间失败
@@ -50,20 +45,20 @@ static const char *_loginfo[] = {};
  * 			4. 循环开辟指向输入引脚指针的指针
  * 			5. 循环开辟指向输出引脚指针的指针以及输出引脚空间
  */
-IOSTUS_e IO_Create(IO *io, unsigned char num[4])
+CMODEL_STATUS_e IO_Create(IO *io, unsigned char num[4])
 {
 	if (io[0] != 0)
 	{
 		LOG_E("IO io is not Null!");
-		return IOSTUS_ERR;
+		return CMODEL_STATUS_IO_ERR;
 	}
 	io[0] = (IO)calloc(1, sizeof(struct IO_t));
 	if (io[0] == 0)
 	{
 		LOG_E("Create IO Filed!");
-		return IOSTUS_FILE;
+		return CMODEL_STATUS_IO_FILE;
 	}
-	io[0]->Flag = IOSTUS_DONE;
+	io[0]->Flag = CMODEL_STATUS_IO_DONE;
 
 	io[0]->I.ANum = num[0];
 	io[0]->I.DNum = num[1];
@@ -76,7 +71,7 @@ IOSTUS_e IO_Create(IO *io, unsigned char num[4])
 		LOG_E("Init I.ppA Error!");
 		free(io[0]);
 		io[0] = 0;
-		return IOSTUS_FILE;
+		return CMODEL_STATUS_IO_FILE;
 	}
 
 	io[0]->I.ppD = (io[0]->I.DNum != 0) ? (d_value **)calloc(io[0]->I.DNum, sizeof(d_value *)) : 0;
@@ -86,7 +81,7 @@ IOSTUS_e IO_Create(IO *io, unsigned char num[4])
 		free(io[0]->I.ppA);
 		free(io[0]);
 		io[0] = 0;
-		return IOSTUS_FILE;
+		return CMODEL_STATUS_IO_FILE;
 	}
 
 	io[0]->O.pA = (io[0]->O.ANum != 0) ? (a_value *)calloc(io[0]->O.ANum, sizeof(a_value)) : 0;
@@ -97,7 +92,7 @@ IOSTUS_e IO_Create(IO *io, unsigned char num[4])
 		free(io[0]->I.ppD);
 		free(io[0]);
 		io[0] = 0;
-		return IOSTUS_FILE;
+		return CMODEL_STATUS_IO_FILE;
 	}
 
 	io[0]->O.pD = (io[0]->O.DNum != 0) ? (d_value *)calloc(io[0]->O.DNum, sizeof(d_value)) : 0;
@@ -109,22 +104,22 @@ IOSTUS_e IO_Create(IO *io, unsigned char num[4])
 		free(io[0]->O.pA);
 		free(io[0]);
 		io[0] = 0;
-		return IOSTUS_FILE;
+		return CMODEL_STATUS_IO_FILE;
 	}
-	return IOSTUS_OK;
+	return CMODEL_STATUS_OK;
 }
 
 /**
  * @brief 删除非空IO模块
  *
  * @param io
- * @return IOSTUS_e
+ * @return CMODEL_STATUS_e
  */
-IOSTUS_e IO_Deleate(IO io)
+CMODEL_STATUS_e IO_Deleate(IO io)
 {
 	if (io == NULL)
 	{
-		return IOSTUS_OK;
+		return CMODEL_STATUS_OK;
 	}
 	free(io->I.ppA);
 	free(io->I.ppD);
@@ -132,7 +127,7 @@ IOSTUS_e IO_Deleate(IO io)
 	free(io->O.pD);
 	free(io);
 	io = NULL;
-	return IOSTUS_OK;
+	return CMODEL_STATUS_OK;
 }
 
 /**
@@ -142,12 +137,12 @@ IOSTUS_e IO_Deleate(IO io)
  * @param type IO模块类型枚举量
  * @param pin IO模块引脚类型枚举量
  * @param pValue 指向变量的指针，注意此处其变量类型为空，在程序内部对其进行了处理
- * @return IOSTUS_OK	引脚建立成功 
- * @return IOSTUS_ERR
+ * @return CMODEL_STATUS_OK	引脚建立成功 
+ * @return CMODEL_STATUS_IO_ERR
  * 		1. 需要建立的引脚非 AI、DI 类型
  * 		2. 需要建立的引脚数量越界
  */
-IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
+CMODEL_STATUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 {
 	unsigned char myLoca = (unsigned char)pin;
 	if (type == IOTYP_DI)
@@ -156,7 +151,7 @@ IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 		if (myLoca > io->I.DNum - 1)
 		{
 			LOG_E("DI max is %d, %d is out of range.", io->I.DNum - 1, myLoca);
-			return IOSTUS_ERR;
+			return CMODEL_STATUS_IO_ERR;
 		}
 		io->I.ppD[myLoca] = pD;
 	}
@@ -166,16 +161,16 @@ IOSTUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *pValue)
 		if (myLoca > io->I.ANum - 1)
 		{
 			LOG_E("AI max is %d, %d is out of range.", io->I.ANum - 1, myLoca);
-			return IOSTUS_ERR;
+			return CMODEL_STATUS_IO_ERR;
 		}
 		io->I.ppA[myLoca] = pA;
 	}
 	else
 	{
 		LOG_E("IO Set Link type Error.");
-		return IOSTUS_ERR;
+		return CMODEL_STATUS_IO_ERR;
 	}
-	return IOSTUS_OK;
+	return CMODEL_STATUS_OK;
 }
 
 /**
@@ -304,9 +299,9 @@ d_value *IO_GetDOPoint(IO io, IOPIN_e pin)
  * @brief 描述：获取模块状态
  * 
  * @param io IO模块指针
- * @return IOSTUS_e 模块状态
+ * @return CMODEL_STATUS_e 模块状态
  */
-IOSTUS_e IO_GetIOFlg(IO io)
+CMODEL_STATUS_e IO_GetIOFlg(IO io)
 {
 	return io->Flag;
 }
@@ -317,18 +312,18 @@ IOSTUS_e IO_GetIOFlg(IO io)
  * @param io IO模块指针
  * @param pin IO模块引脚类型枚举量
  * @param fVal 输出值
- * @return IOSTUS_OK	设置成功 
- * @return IOSTUS_ERR	设置出错。模拟量输出引脚越界
+ * @return CMODEL_STATUS_OK	设置成功 
+ * @return CMODEL_STATUS_IO_ERR	设置出错。模拟量输出引脚越界
  */
-IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
+CMODEL_STATUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
 {
 	if (!IS_VALID_AO_PIN(io, pin))
 	{
 		LOG_E("Model: %s Out of range.");
-		return IOSTUS_ERR;
+		return CMODEL_STATUS_IO_ERR;
 	}
 	io->O.pA[pin] = fVal;
-	return IOSTUS_OK;
+	return CMODEL_STATUS_OK;
 }
 
 /**
@@ -337,18 +332,18 @@ IOSTUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
  * @param io IO模块指针
  * @param pin IO模块引脚类型枚举量
  * @param ucVal 输出值
- * @return IOSTUS_OK	设置成功
- * @return IOSTUS_ERR	设置出错。数字量输出引脚越界
+ * @return CMODEL_STATUS_OK	设置成功
+ * @return CMODEL_STATUS_IO_ERR	设置出错。数字量输出引脚越界
  */
-IOSTUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
+CMODEL_STATUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
 {
 	if (!IS_VALID_DO_PIN(io, pin))
 	{
 		LOG_E("Model: %s Out of range.");
-		return IOSTUS_ERR;
+		return CMODEL_STATUS_IO_ERR;
 	}
 	io->O.pD[pin] = ucVal;
-	return IOSTUS_OK;
+	return CMODEL_STATUS_OK;
 }
 
 /**

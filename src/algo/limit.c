@@ -4,11 +4,6 @@
 
 #if CM_LOG_LIMIT
 #define LOG_TAG "LIMIT"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = {NULL};
 #endif
 #include "cm_log.h"
 

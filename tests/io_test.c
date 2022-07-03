@@ -1,10 +1,4 @@
-
-#include <stdio.h>
 #include "common.h"
-
-#include "Unity/src/unity_internals.h"
-#include "Unity/examples/unity_config.h"
-#include "unity/src/unity.h"
 
 IO _io;
 #define SHOW_ITEMS (2)
@@ -19,12 +13,12 @@ static void _iotest(void)
     num[IOTYP_AO] = 1;
     num[IOTYP_DI] = 2;
     num[IOTYP_DO] = 2;
-    TEST_ASSERT(IO_Create(&_io, num) == IOSTUS_OK);
-    TEST_ASSERT(IO_Create(&_io, num) != IOSTUS_OK);
+    TEST_ASSERT(IO_Create(&_io, num) == CMODEL_STATUS_OK);
+    TEST_ASSERT(IO_Create(&_io, num) != CMODEL_STATUS_OK);
     IO_ShowALL(_io);
-    TEST_ASSERT(IO_SetAOValue(_io, IOPIN_1, 1.0f) == IOSTUS_OK);
+    TEST_ASSERT(IO_SetAOValue(_io, IOPIN_1, 1.0f) == CMODEL_STATUS_OK);
     IO_ShowPin(_io, IOTYP_AO, IOPIN_1);
-    TEST_ASSERT(IO_SetAOValue(_io, IOPIN_8, 1.0f) != IOSTUS_OK);
+    TEST_ASSERT(IO_SetAOValue(_io, IOPIN_8, 1.0f) != CMODEL_STATUS_OK);
     IO_ShowPin(_io, IOTYP_AO, IOPIN_8);
 }
 

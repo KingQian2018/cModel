@@ -1,17 +1,12 @@
 #include "translate.h"
 #include <memory.h>
+#include "cm_log.h"
 
 #if CM_TRANSLATE
 
 #if CM_LOG_TRANSLATE
 #define LOG_TAG "TRANSLATE"
-#define T(t) #t,
-static const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-static const char *_loginfo[] = {};
 #endif
-#include "cm_log.h"
 
 const static char *name = "TRANSLATE";
 
