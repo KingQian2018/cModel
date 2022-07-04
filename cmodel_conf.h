@@ -12,6 +12,7 @@
 #define CM_LOG_LIMIT 1
 #define CM_LOG_SWITCH 1
 #define CM_LOG_GAIN 1
+#define CM_LOG_PARSE 1
 #else
 #define CM_LOG_IO 0
 #define CM_LOG_CM 0

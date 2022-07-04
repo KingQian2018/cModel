@@ -1,12 +1,12 @@
 #include "translate.h"
 #include <memory.h>
+#include "cm_log.h"
 
 #if CM_TRANSLATE
 
 #if CM_LOG_TRANSLATE
 #define LOG_TAG "TRANSLATE"
 #endif
-#include "cm_log.h"
 
 const static char *name = "TRANSLATE";
 
@@ -111,6 +111,9 @@ uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
  * @param T			时间常数。单位 S
  * @param n			阶次
  * @param Tao 		纯延时。单位 S
+ * @return 
+ * 		CMODEL_STATUS_OK 成功
+ * 		CMODEL_STATUS_CM_CREATEPAR 中间状态参数创建失败 
  */
 uint32_t translate_setPar(CModel cm, float K, uint32_t T, short n, float Tao)
 {

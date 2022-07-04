@@ -1,19 +1,37 @@
-
+/**
+ * @file cm.c
+ * @author KisWang (KingQian2018)
+ * @brief 模块核心代码
+ * @version 0.1
+ * @date 2022-07-03
+ *
+ * @copyright Copyright (c) 2022
+ *
+ */
 #include "cm.h"
 
 #if CM_LOG_CM
-#define T(t) #t,
 #define LOG_TAG "CModel"
-const char *_loginfo[] = {CMODEL_ERROR};
-#undef T
-#else
-const char *_loginfo[] = {NULL};
 #endif
 #include "cm_log.h"
 
 static CModel _register;
 static const char *_name = "CMODEL";
-uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8_t num[4])
+
+/**
+ * @brief 动态创建模块
+ *
+ * @param cm 模块指针
+ * @param name 模块名
+ * @param id 模块ID
+ * @param dt 模块运行时间间隔
+ * @param num 模块引脚个数
+ * @return CMODEL_STATUS_CM_NOTNULL cm模块非空
+ * @return CMODEL_STATUS_CM_CREATE cm模块创建失败
+ * @return CMODEL_STATUS_IO_ERR cm模块引脚创建失败
+ * @return CMODEL_STATUS_OK cm模块创建成功
+ */
+CMODEL_STATUS_e cm_create(CModel *cm, const char *name, CMODEL_STATUS_e id, CMODEL_STATUS_e dt, uint8_t num[4])
 {
     if (cm[0] != NULL)
     {
@@ -29,7 +47,7 @@ uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8
     cm[0]->name = name == NULL ? _name : name;
     cm[0]->id = id;
     cm[0]->dt = dt;
-    if (IO_Create(&(cm[0]->io), num) != IOSTUS_OK)
+    if (IO_Create(&(cm[0]->io), num) != CMODEL_STATUS_OK)
     {
         LOG_E("%s create IO error.", name);
         return CMODEL_STATUS_IO_ERR;
@@ -50,7 +68,13 @@ uint32_t cm_create(CModel *cm, const char *name, uint32_t id, uint32_t dt, uint8
     return CMODEL_STATUS_OK;
 }
 
-uint32_t cm_deleate(CModel *cm)
+/**
+ * @brief 删除指定模块
+ *
+ * @param cm 删除模块
+ * @return CMODEL_STATUS_OK 删除成功
+ */
+CMODEL_STATUS_e cm_deleate(CModel *cm)
 {
     CModel pre = cm[0]->pre;
     CModel next = cm[0]->next;
@@ -80,13 +104,18 @@ uint32_t cm_deleate(CModel *cm)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t cm_commonDeleatePar(CModel cm)
+CMODEL_STATUS_e cm_commonDeleatePar(CModel cm)
 {
     free(cm->par);
     return CMODEL_STATUS_OK;
 }
-
-uint32_t cm_run(unsigned int dt)
+/**
+ * @brief 遍历所有模块运行
+ *
+ * @param dt 运行时间间隔
+ * @return CMODEL_STATUS_OK 运行成功
+ */
+CMODEL_STATUS_e cm_run(unsigned int dt)
 {
     CModel *tmp = &_register;
     if (tmp[0] == NULL)
@@ -104,21 +133,38 @@ uint32_t cm_run(unsigned int dt)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
+/**
+ * @brief 模块建立链接
+ *
+ * @param type 链接类型
+ * @param cmSrc 源模块
+ * @param pinSrc 源模块引脚
+ * @param cmDst 目标模块
+ * @param pinDst 目标模块引脚
+ * @return CMODEL_STATUS_OK 建立成功
+ * @return CMODEL_STATUS_IO_ERR 建立失败
+ */
+CMODEL_STATUS_e cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst)
 {
     if (type == IOTYP_AI)
     {
-        IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
+        return IO_setLink(cmSrc->io, type, pinSrc, IO_GetAOPoint(cmDst->io, pinDst));
     }
     else
     {
-        IO_setLink(cmSrc->io, type, pinSrc, IO_GetDOPoint(cmDst->io, pinDst));
+        return IO_setLink(cmSrc->io, type, pinSrc, IO_GetDOPoint(cmDst->io, pinDst));
     }
-    return CMODEL_STATUS_OK;
 }
 
 #include <stdio.h>
-uint32_t cm_showAll(CModel cm)
+/**
+ * @brief 显示指定模块数据
+ *
+ * @param cm 模块
+ * @return CMODEL_STATUS_CM_NULL 模块空
+ * @return CMODEL_STATUS_OK 成功
+ */
+CMODEL_STATUS_e cm_showAll(CModel cm)
 {
     if (cm == NULL)
     {
@@ -130,7 +176,16 @@ uint32_t cm_showAll(CModel cm)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin)
+/**
+ * @brief 显示指定模块引脚
+ *
+ * @param cm 模块
+ * @param type 引脚类型
+ * @param pin 引脚索引
+ * @return CMODEL_STATUS_CM_NULL 模块空
+ * @return CMODEL_STATUS_OK 成功
+ */
+CMODEL_STATUS_e cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin)
 {
     if (cm == NULL)
     {
@@ -142,16 +197,32 @@ uint32_t cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin)
     return CMODEL_STATUS_OK;
 }
 
+/**
+ * @brief 获取指定模块引脚模拟量数据
+ *
+ * @param cm 模块
+ * @param pin 引脚索引
+ * @param type 输出/输入
+ * @return a_value
+ */
 a_value cm_getAPin(CModel cm, IOPIN_e pin, IOTYP_e type)
 {
     if (cm == NULL)
     {
-        LOG_E("CM_NULL.");
+        LOG_E("%s-%s: CM_NULL.", __FILE__, __LINE__);
         return 0;
     }
     return IO_GetAValue(cm->io, pin, type);
 }
 
+/**
+ * @brief 获取指定模块引脚数字量数据
+ *
+ * @param cm 模块
+ * @param pin 引脚索引
+ * @param type 输出/输入
+ * @return d_value
+ */
 d_value cm_getDPin(CModel cm, IOPIN_e pin, IOTYP_e type)
 {
     if (cm == NULL)

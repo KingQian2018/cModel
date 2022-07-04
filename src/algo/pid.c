@@ -1,7 +1,6 @@
 #include "pid.h"
 
 #if CM_PID
-
 #if CM_LOG_PID
 #define LOG_TAG "PID"
 #endif
