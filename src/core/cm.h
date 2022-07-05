@@ -49,10 +49,10 @@ extern "C"
         CModel pre;
         CModel next;
         const char *name;           // 模块名称
-        CMODEL_STATUS_e id;                // 唯一标识符
+        CMODEL_STATUS_e id;         // 唯一标识符
         IO io;                      // io 引脚
         CMODEL_TYPE_e type;         // 模块类型
-        CMODEL_STATUS_e dt;                // 运行时间间隔
+        CMODEL_STATUS_e dt;         // 运行时间间隔
         Init_CB init;               // 初始化
         Run_CB run;                 // 运行
         DeleateByCM_CB deleateByCM; // 删除

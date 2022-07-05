@@ -10,13 +10,13 @@ extern "C"
 {
 #endif
 
-    uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt);
-    uint32_t pid_setLink(CModel cm, a_value *pPV, a_value *pSP, a_value *pFF, a_value *pTR, d_value *pSTR);
-    uint32_t pid_setPID(CModel cm, float p, float i, float d);
-    uint32_t pid_setSP(CModel cm, float basis, float gain);
-    uint32_t pid_setPV(CModel cm, float basis, float gain);
-    uint32_t pid_setLimit(CModel cm, float h, float l);
-    uint32_t pid_setDt(CModel cm, uint32_t dt);
+    CModel pid_create(uint32_t id, uint32_t dt);
+    CMODEL_STATUS_e pid_setLink(CModel cm, a_value *pPV, a_value *pSP, a_value *pFF, a_value *pTR, d_value *pSTR);
+    CMODEL_STATUS_e pid_setPID(CModel cm, float p, float i, float d);
+    CMODEL_STATUS_e pid_setSP(CModel cm, float basis, float gain);
+    CMODEL_STATUS_e pid_setPV(CModel cm, float basis, float gain);
+    CMODEL_STATUS_e pid_setLimit(CModel cm, float h, float l);
+    CMODEL_STATUS_e pid_setDt(CModel cm, uint32_t dt);
 
 #ifdef __cplusplus
 }

@@ -11,6 +11,7 @@ file(COPY ${test_files} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/outputs/")
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/parse_test")
 file(GLOB test_parsefiles "parse_test/*")
+file(REMOVE test_parsefiles "parse_test/*")
 file(COPY ${test_parsefiles} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/parse_test/")
 
 message(STATUS "KW: ${LIBS}")

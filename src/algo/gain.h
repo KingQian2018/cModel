@@ -10,8 +10,8 @@ extern "C"
 {
 #endif
 
-    uint32_t gain_create(CModel *cm, uint32_t id, uint32_t dt);
-    uint32_t gain_setPar(CModel cm, a_value gain);
+    CModel gain_create(uint32_t id, uint32_t dt);
+    CMODEL_STATUS_e gain_setPar(CModel cm, a_value gain);
 
 #ifdef __cplusplus
 }

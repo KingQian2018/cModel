@@ -17,9 +17,9 @@ extern "C"
         SWITCH_TYPE_TOOGLE,
     } SwitchType_e;
 
-    uint32_t switch_create(CModel *cm, uint32_t id, uint32_t dt, SwitchType_e type);
-    uint32_t switch_setPar(CModel cm, SwitchType_e type, uint32_t triggleT);
-    uint32_t switch_toggle(CModel cm, uint32_t triggleT);
+    CModel switch_create(uint32_t id, uint32_t dt);
+    CMODEL_STATUS_e switch_setPar(CModel cm, SwitchType_e type, uint32_t triggleT);
+    CMODEL_STATUS_e switch_toggle(CModel cm, uint32_t triggleT);
 
 #ifdef __cplusplus
 }

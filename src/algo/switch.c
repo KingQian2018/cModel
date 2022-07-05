@@ -18,14 +18,14 @@ typedef struct _SwitchPar_s
     bool toggleFlg;    // 翻转标志
 } SwitchPar_s;
 
-static uint32_t _del(CModel cm)
+static CMODEL_STATUS_e _del(CModel cm)
 {
     IS_VALID_TYPE(cm, CMODEL_SWITCH);
     free(cm->par);
     return CMODEL_STATUS_OK;
 }
 
-static uint32_t _run(CModel cm, uint32_t dt)
+static CMODEL_STATUS_e _run(CModel cm, uint32_t dt)
 {
     if (cm == NULL)
     {
@@ -68,38 +68,40 @@ static uint32_t _run(CModel cm, uint32_t dt)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t switch_create(CModel *cm, uint32_t id, uint32_t dt, SwitchType_e type)
+CModel switch_create(uint32_t id, uint32_t dt)
 {
+    CModel cm = NULL;
     uint8_t num[4] = {0, 0, 0, 1};
-    cm_create(cm, name, id, dt, num);
-    if (cm[0] == NULL)
+    cm_create(&cm, name, id, dt, num);
+    if (cm == NULL)
     {
         LOG_E("%s %d Create Error.", name, id);
-        return CMODEL_STATUS_CM_CREATE;
+        return cm;
     }
-    cm[0]->type = CMODEL_SWITCH;
-    cm[0]->par = (SwitchPar_s *)calloc(1, sizeof(SwitchPar_s));
-    if (cm[0]->par == NULL)
+    cm->type = CMODEL_SWITCH;
+    cm->par = (SwitchPar_s *)calloc(1, sizeof(SwitchPar_s));
+    if (cm->par == NULL)
     {
         LOG_E("%s %d Create Par Error.", name, id);
-        return CMODEL_STATUS_CM_CREATEPAR;
+        cm_deleate(&cm);
+        return cm;
     }
 
-    SwitchPar_s *par = (SwitchPar_s *)cm[0]->par;
+    SwitchPar_s *par = (SwitchPar_s *)cm->par;
 
     par->lstT = par->triggleT = 0;
-    par->type = type;
+    par->type = SWITCH_TYPE_L2H;
     if (par->type == SWITCH_TYPE_H2L)
     {
         par->lstU = 1;
     }
 
-    cm[0]->deleateByCM = cm_commonDeleatePar;
-    cm[0]->run = _run;
-    return CMODEL_STATUS_OK;
+    cm->deleateByCM = cm_commonDeleatePar;
+    cm->run = _run;
+    return cm;
 }
 
-uint32_t switch_setPar(CModel cm, SwitchType_e type, uint32_t triggleT)
+CMODEL_STATUS_e switch_setPar(CModel cm, SwitchType_e type, uint32_t triggleT)
 {
     IS_VALID_TYPE(cm, CMODEL_SWITCH);
     SwitchPar_s *par = (SwitchPar_s *)cm->par;
@@ -118,7 +120,7 @@ uint32_t switch_setPar(CModel cm, SwitchType_e type, uint32_t triggleT)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t switch_toggle(CModel cm, uint32_t triggleT)
+CMODEL_STATUS_e switch_toggle(CModel cm, uint32_t triggleT)
 {
     IS_VALID_TYPE(cm, CMODEL_SWITCH);
     SwitchPar_s *par = (SwitchPar_s *)cm->par;

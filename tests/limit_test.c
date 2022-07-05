@@ -13,10 +13,10 @@ void limit_test(void)
     elog_set_fmt(ELOG_LVL_VERBOSE, ELOG_FMT_ALL & ~(ELOG_FMT_FUNC | ELOG_FMT_T_INFO | ELOG_FMT_P_INFO));
     elog_start();
 
-    const_create(&_m_const_2, 6, 1);
+    _m_const_2 = const_create(6, 1);
     const_setTargetT(_m_const_2, 100);
     const_setValue(_m_const_2, 200);
-    limit_create(&_m_limit_1, 7, 1);
+    _m_limit_1 = limit_create(7, 1);
     limit_setPar(_m_limit_1, 100, -100, 100);
 
     cm_setLink(IOTYP_AI, _m_limit_1, IOPIN_1, _m_const_2, IOPIN_1);

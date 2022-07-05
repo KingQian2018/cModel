@@ -25,14 +25,14 @@ typedef struct _TranslatePar_s
 	TranslateSta_s sta;
 } TranslatePar_s;
 
-static uint32_t _del(CModel cm)
+static CMODEL_STATUS_e _del(CModel cm)
 {
 	IS_VALID_TYPE(cm, CMODEL_TRANSLATE);
 	free(cm->par);
 	return CMODEL_STATUS_OK;
 }
 
-static uint32_t _run(CModel cm, uint32_t dt)
+static CMODEL_STATUS_e _run(CModel cm, uint32_t dt)
 {
 	if (cm == NULL)
 	{
@@ -65,24 +65,26 @@ static uint32_t _run(CModel cm, uint32_t dt)
 }
 
 #include <math.h>
-uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
+CModel translate_create(uint32_t id, uint32_t dt)
 {
+	CModel cm = NULL;
 	uint8_t num[4] = {1, 0, 1, 0};
-	cm_create(cm, name, id, dt, num);
-	if (cm[0] == NULL)
+	cm_create(&cm, name, id, dt, num);
+	if (cm == NULL)
 	{
 		LOG_E("%s %d Create Error.", name, id);
-		return CMODEL_STATUS_CM_CREATE;
+		return cm;
 	}
-	cm[0]->type = CMODEL_TRANSLATE;
-	cm[0]->par = (TranslatePar_s *)calloc(1, sizeof(TranslatePar_s));
-	if (cm[0]->par == NULL)
+	cm->type = CMODEL_TRANSLATE;
+	cm->par = (TranslatePar_s *)calloc(1, sizeof(TranslatePar_s));
+	if (cm->par == NULL)
 	{
 		LOG_E("%s %d Create Par Error.", name, id);
-		return CMODEL_STATUS_CM_CREATEPAR;
+		cm_deleate(&cm);
+		return cm;
 	}
 
-	TranslatePar_s *par = (TranslatePar_s *)cm[0]->par;
+	TranslatePar_s *par = (TranslatePar_s *)cm->par;
 	par->K = 1;
 	par->Tao = 0;
 	par->T = 1;
@@ -91,18 +93,19 @@ uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
 	if (par->sta.pMidStat == NULL)
 	{
 		LOG_E("pMidStat malloc error.");
-		return CMODEL_STATUS_CM_CREATEPAR;
+		cm_deleate(&cm);
+		return cm;
 	}
 	else
 	{
 		memset(par->sta.pMidStat, 0, 1 * sizeof(a_value));
 	}
-	par->sta.a = expf(-((float)cm[0]->dt / 1000.0f) / (float)par->T);
+	par->sta.a = expf(-((float)cm->dt / 1000.0f) / (float)par->T);
 	par->sta.b = 1 - par->sta.a;
 
-	cm[0]->deleateByCM = cm_commonDeleatePar;
-	cm[0]->run = _run;
-	return CMODEL_STATUS_OK;
+	cm->deleateByCM = cm_commonDeleatePar;
+	cm->run = _run;
+	return cm;
 }
 
 /**
@@ -111,11 +114,11 @@ uint32_t translate_create(CModel *cm, uint32_t id, uint32_t dt)
  * @param T			时间常数。单位 S
  * @param n			阶次
  * @param Tao 		纯延时。单位 S
- * @return 
+ * @return
  * 		CMODEL_STATUS_OK 成功
- * 		CMODEL_STATUS_CM_CREATEPAR 中间状态参数创建失败 
+ * 		CMODEL_STATUS_CM_CREATEPAR 中间状态参数创建失败
  */
-uint32_t translate_setPar(CModel cm, float K, uint32_t T, short n, float Tao)
+CMODEL_STATUS_e translate_setPar(CModel cm, float K, uint32_t T, short n, float Tao)
 {
 	IS_VALID_TYPE(cm, CMODEL_TRANSLATE);
 	TranslatePar_s *par = (TranslatePar_s *)cm->par;

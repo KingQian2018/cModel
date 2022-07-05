@@ -10,8 +10,8 @@ extern "C"
 {
 #endif
 
-    uint32_t limit_create(CModel *cm, uint32_t id, uint32_t dt);
-    uint32_t limit_setPar(CModel cm, a_value h, a_value l, a_value s);
+    CModel limit_create(uint32_t id, uint32_t dt);
+    CMODEL_STATUS_e limit_setPar(CModel cm, a_value h, a_value l, a_value s);
 
 #ifdef __cplusplus
 }

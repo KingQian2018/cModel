@@ -15,7 +15,7 @@
 #endif
 #include "cm_log.h"
 
-static CModel _register;
+static CModel _register; // 根模块
 static const char *_name = "CMODEL";
 
 /**
@@ -104,11 +104,22 @@ CMODEL_STATUS_e cm_deleate(CModel *cm)
     return CMODEL_STATUS_OK;
 }
 
+/**
+ * @brief 删除模块的参数配置
+ *
+ * @param cm 当前模块的参数配置
+ * @return CMODEL_STATUS_e
+ */
 CMODEL_STATUS_e cm_commonDeleatePar(CModel cm)
 {
-    free(cm->par);
+    if (cm->par != NULL)
+    {
+        free(cm->par);
+        cm->par = NULL;
+    }
     return CMODEL_STATUS_OK;
 }
+
 /**
  * @brief 遍历所有模块运行
  *
