@@ -72,11 +72,39 @@ cleanup:
     return content;
 }
 
-CModel *_PID;
-CMODEL_STATUS_e parse_PID(const cJSON *par, unsigned char idx)
+// CModel *_PID;
+CModel *_CMODELS;
+// CModel parse_PID(const cJSON *par, unsigned char idx)
+// {
+//     return pid_create(cJSON_GetNumberValue(cJSON_GetObjectItem(par, "id")),
+//                       cJSON_GetNumberValue(cJSON_GetObjectItem(par, "dt")));
+// }
+
+#include "auto_generate.h"
+#include <string.h>
+CMODEL_STATUS_e prase_model(const cJSON *par)
 {
-    return pid_create(&_PID[idx], cJSON_GetNumberValue(cJSON_GetObjectItem(par, "id")),
-                      cJSON_GetNumberValue(cJSON_GetObjectItem(par, "dt")));
+    for (unsigned int i = 0; i < Prase_Datas_len; i++)
+    {
+        cJSON *model = cJSON_GetObjectItem(par, Prase_Datas[i].name);
+        if (model != NULL)
+        {
+            unsigned char model_cnt = cJSON_GetArraySize(model);
+            for (unsigned char model_idx = 0; model_idx < model_cnt; model_idx++)
+            {
+                cJSON *arrayItem = cJSON_GetArrayItem(model, model_idx);
+                unsigned int id = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "id"));
+                unsigned int dt = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "dt"));
+                if (Prase_Datas[i].createCB(id, dt) == NULL)
+                {
+                    LOG_E("%s: Parse Model Error.", Prase_Datas[i].name);
+                    return CMODEL_STATUS_CM_CREATE;
+                }
+                LOG_I("%s create. id: %d,dt: %d", Prase_Datas[i].name, id, dt);
+            }
+        }
+    }
+    return CMODEL_STATUS_OK;
 }
 
 /**
@@ -113,32 +141,33 @@ CMODEL_STATUS_e parse_file(const char *cm_file)
     }
 
     //... parse json datas
-    cmodel = cJSON_GetObjectItem(parsed, "PID");
-    if (cmodel == NULL)
-    {
-        LOG_E("Failed to parse cmodel.");
-        goto fail_parse;
-    }
-    else
-    {
-        unsigned char cmodel_size = 0;
-        cmodel_size = cJSON_GetArraySize(cmodel);
-        LOG_I("cmodel: PID, sum: %d", cmodel_size);
-        _PID = (CModel *)calloc(cmodel_size, sizeof(CModel));
-        if (_PID == NULL)
-        {
-            LOG_E("Failed to create _PIDs.");
-            goto fail_parse;
-        }
-        for (unsigned char i = 0; i < cmodel_size; i++)
-        {
-            if (parse_PID(cJSON_GetArrayItem(cmodel, i), i) != CMODEL_STATUS_OK)
-            {
-                LOG_E("Failed to create cmodel.");
-                goto fail_parse;
-            }
-        }
-    }
+    prase_model(parsed);
+    // cmodel = cJSON_GetObjectItem(parsed, "PID");
+    // if (cmodel == NULL)
+    // {
+    //     LOG_E("Failed to parse cmodel.");
+    //     goto fail_parse;
+    // }
+    // else
+    // {
+    //     unsigned char cmodel_size = 0;
+    //     cmodel_size = cJSON_GetArraySize(cmodel);
+    //     LOG_I("cmodel: PID, sum: %d", cmodel_size);
+    //     _PID = (CModel *)calloc(cmodel_size, sizeof(CModel));
+    //     if (_PID == NULL)
+    //     {
+    //         LOG_E("Failed to create _PIDs.");
+    //         goto fail_parse;
+    //     }
+    //     for (unsigned char i = 0; i < cmodel_size; i++)
+    //     {
+    //         if (parse_PID(cJSON_GetArrayItem(cmodel, i), i) != CMODEL_STATUS_OK)
+    //         {
+    //             LOG_E("Failed to create cmodel.");
+    //             goto fail_parse;
+    //         }
+    //     }
+    // }
 
     free(f);
     cJSON_Delete(parsed);

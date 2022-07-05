@@ -47,14 +47,7 @@ typedef struct
     PIDSta_t sta;   // 运行状态
 } PIDPar_t;
 
-static uint32_t pid_del(CModel cm)
-{
-    IS_VALID_TYPE(cm, CMODEL_PID);
-    free(cm->par);
-    return CMODEL_STATUS_OK;
-}
-
-static uint32_t pid_run(CModel cm, uint32_t dt)
+static CMODEL_STATUS_e _run(CModel cm, uint32_t dt)
 {
     IS_VALID_TYPE(cm, CMODEL_PID);
 
@@ -116,24 +109,26 @@ static uint32_t pid_run(CModel cm, uint32_t dt)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt)
+CModel pid_create(uint32_t id, uint32_t dt)
 {
+    CModel cm = NULL;
     uint8_t num[4] = {4, 1, 1, 0};
-    cm_create(cm, name, id, dt, num);
-    if (cm[0] == NULL)
+    cm_create(&cm, name, id, dt, num);
+    if (cm == NULL)
     {
         LOG_E("PID %d Create Error.", id);
-        return CMODEL_STATUS_CM_CREATE;
+        return cm;
     }
-    cm[0]->type = CMODEL_PID;
-    cm[0]->par = (PIDPar_t *)calloc(1, sizeof(PIDPar_t));
-    if (cm[0]->par == NULL)
+    cm->type = CMODEL_PID;
+    cm->par = (PIDPar_t *)calloc(1, sizeof(PIDPar_t));
+    if (cm->par == NULL)
     {
         LOG_E("PID %d Create Par Error.", id);
-        return CMODEL_STATUS_CM_CREATEPAR;
+        cm_deleate(&cm);
+        return cm;
     }
 
-    PIDPar_t *par = (PIDPar_t *)cm[0]->par;
+    PIDPar_t *par = (PIDPar_t *)cm->par;
     par->HigOut = 100;
     par->LowOut = -100;
     par->KP = par->KI = par->KD = 0;
@@ -142,12 +137,12 @@ uint32_t pid_create(CModel *cm, uint32_t id, uint32_t dt)
     par->sta.Err[0] = par->sta.Err[1] = par->sta.Err[2] = 0;
     par->sta.LastI = par->sta.LastKP = par->sta.LastU = 0;
 
-    cm[0]->deleateByCM = pid_del;
-    cm[0]->run = pid_run;
-    return CMODEL_STATUS_OK;
+    cm->deleateByCM = cm_commonDeleatePar;
+    cm->run = _run;
+    return cm;
 }
 
-uint32_t pid_setPID(CModel cm, float p, float i, float d)
+CMODEL_STATUS_e pid_setPID(CModel cm, float p, float i, float d)
 {
     IS_VALID_TYPE(cm, CMODEL_PID);
     PIDPar_t *par = cm->par;
@@ -157,7 +152,7 @@ uint32_t pid_setPID(CModel cm, float p, float i, float d)
     return CMODEL_STATUS_OK;
 }
 
-static uint32_t _pid_setSPPV(CModel cm, unsigned char sp_pv, float basis, float gain)
+static CMODEL_STATUS_e _pid_setSPPV(CModel cm, unsigned char sp_pv, float basis, float gain)
 {
     IS_VALID_TYPE(cm, CMODEL_PID);
     PIDPar_t *par = cm->par;
@@ -167,11 +162,11 @@ static uint32_t _pid_setSPPV(CModel cm, unsigned char sp_pv, float basis, float 
     return CMODEL_STATUS_OK;
 }
 
-uint32_t pid_setSP(CModel cm, float basis, float gain) { return _pid_setSPPV(cm, 0, basis, gain); }
+CMODEL_STATUS_e pid_setSP(CModel cm, float basis, float gain) { return _pid_setSPPV(cm, 0, basis, gain); }
 
-uint32_t pid_setPV(CModel cm, float basis, float gain) { return _pid_setSPPV(cm, 1, basis, gain); }
+CMODEL_STATUS_e pid_setPV(CModel cm, float basis, float gain) { return _pid_setSPPV(cm, 1, basis, gain); }
 
-uint32_t pid_setLimit(CModel cm, float h, float l)
+CMODEL_STATUS_e pid_setLimit(CModel cm, float h, float l)
 {
     IS_VALID_TYPE(cm, CMODEL_PID);
     PIDPar_t *par = cm->par;
@@ -180,7 +175,7 @@ uint32_t pid_setLimit(CModel cm, float h, float l)
     return CMODEL_STATUS_OK;
 }
 
-uint32_t pid_setDt(CModel cm, uint32_t dt)
+CMODEL_STATUS_e pid_setDt(CModel cm, uint32_t dt)
 {
     IS_VALID_TYPE(cm, CMODEL_PID);
     cm->dt = dt;

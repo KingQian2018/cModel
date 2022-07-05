@@ -27,9 +27,9 @@ CModel m_pid_2 = NULL;
 CModel m_pid_3 = NULL;
 static void _pid_test(void)
 {
-    CMODEL_TEST_ASSERT_CREATE_OK(pid_create(&m_pid_1, 1, 1), m_pid_1);
-    CMODEL_TEST_ASSERT_CREATE_OK(pid_create(&m_pid_2, 1, 1), m_pid_2);
-    CMODEL_TEST_ASSERT_CREATE_OK(pid_create(&m_pid_3, 1, 1), m_pid_3);
+    CMODEL_TEST_ASSERT_CREATE_OK(m_pid_1 = pid_create(1, 1), m_pid_1);
+    CMODEL_TEST_ASSERT_CREATE_OK(m_pid_2 = pid_create(1, 1), m_pid_2);
+    CMODEL_TEST_ASSERT_CREATE_OK(m_pid_3 = pid_create(1, 1), m_pid_3);
     CMODEL_TEST_ASSERT_SETLINK_OK(cm_setLink(IOTYP_AI, m_pid_1, IOPIN_1, m_pid_2, IOPIN_1), m_pid_2);
     cm_deleate(&m_pid_3);
     IO_ShowALL(m_pid_1->io);
@@ -38,7 +38,7 @@ static void _pid_test(void)
 CModel m_const_1 = NULL;
 static void _const_test(void)
 {
-    CMODEL_TEST_ASSERT_CREATE_OK(const_create(&m_const_1, 4, 1), m_const_1);
+    CMODEL_TEST_ASSERT_CREATE_OK(m_const_1 = const_create(4, 1), m_const_1);
     CMODEL_TEST_ASSERT_SETLINK_OK(cm_setLink(IOTYP_AI, m_pid_1, IOPIN_1, m_const_1, IOPIN_1), m_const_1);
 }
 
@@ -46,7 +46,7 @@ CModel m_translate_1 = NULL;
 CModel m_translate_2 = NULL;
 static void _translate_test(void)
 {
-    CMODEL_TEST_ASSERT_CREATE_OK(translate_create(&m_translate_1, 5, 1), m_translate_1);
+    CMODEL_TEST_ASSERT_CREATE_OK(m_translate_1 = translate_create(5, 1), m_translate_1);
     CMODEL_TEST_ASSERT_SETLINK_OK(cm_setLink(IOTYP_AI, m_translate_1, IOPIN_1, m_pid_1, IOPIN_1), m_pid_1);
     CMODEL_TEST_ASSERT_SETLINK_OK(cm_setLink(IOTYP_AI, m_pid_1, IOPIN_2, m_translate_1, IOPIN_1), m_translate_1);
     translate_setPar(m_translate_1, 1, 1, 1, 0);
@@ -54,12 +54,12 @@ static void _translate_test(void)
 
 static void _model_create(void)
 {
-    pid_create(&m_pid_1, 1, 1);
-    pid_create(&m_pid_2, 2, 1);
-    pid_create(&m_pid_3, 3, 1);
-    const_create(&m_const_1, 4, 1);
-    translate_create(&m_translate_1, 5, 1);
-    translate_create(&m_translate_2, 6, 1);
+    m_pid_1 = pid_create(1, 1);
+    m_pid_2 = pid_create(2, 1);
+    m_pid_3 = pid_create(3, 1);
+    m_const_1 = const_create(4, 1);
+    m_translate_1 = translate_create(5, 1);
+    m_translate_2 = translate_create(6, 1);
 }
 
 static void _model_set(void)

@@ -16,6 +16,8 @@ extern "C"
     T(CONST)        \
     T(TRANSLATE)    \
     T(LIMIT)        \
+    T(SWITCH)       \
+    T(GAIN)         \
     T(PID)
 #define T(typ) CMODEL_##typ,
     typedef enum
@@ -23,6 +25,8 @@ extern "C"
         CMODEL_TYPE
     } CMODEL_TYPE_e;
 #undef T
+
+    extern const char *_loginfo[];
 
 #define IS_VALID_TYPE(cm, typ)           \
     if (cm == NULL || cm->type != typ)   \
@@ -45,10 +49,10 @@ extern "C"
         CModel pre;
         CModel next;
         const char *name;           // 模块名称
-        CMODEL_STATUS_e id;                // 唯一标识符
+        CMODEL_STATUS_e id;         // 唯一标识符
         IO io;                      // io 引脚
         CMODEL_TYPE_e type;         // 模块类型
-        CMODEL_STATUS_e dt;                // 运行时间间隔
+        CMODEL_STATUS_e dt;         // 运行时间间隔
         Init_CB init;               // 初始化
         Run_CB run;                 // 运行
         DeleateByCM_CB deleateByCM; // 删除
@@ -61,6 +65,7 @@ extern "C"
     CMODEL_STATUS_e cm_create(CModel *cm, const char *name, CMODEL_STATUS_e id, CMODEL_STATUS_e dt, uint8_t num[4]);
     CMODEL_STATUS_e cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cmDst, IOPIN_e pinDst);
     CMODEL_STATUS_e cm_deleate(CModel *cm);
+    CMODEL_STATUS_e cm_commonDeleatePar(CModel cm);
     CMODEL_STATUS_e cm_run(unsigned int dt);
     CMODEL_STATUS_e cm_showAll(CModel cm);
     CMODEL_STATUS_e cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin);

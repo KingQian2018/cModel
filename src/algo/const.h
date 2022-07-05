@@ -10,9 +10,9 @@ extern "C"
 {
 #endif
 
-	uint32_t const_create(CModel *cm, uint32_t id, uint32_t dt);
-	uint32_t const_setTargetT(CModel cm, uint32_t tT);
-	uint32_t const_setValue(CModel cm, a_value v);
+	CModel const_create(uint32_t id, uint32_t dt);
+	CMODEL_STATUS_e const_setTargetT(CModel cm, uint32_t tT);
+	CMODEL_STATUS_e const_setValue(CModel cm, a_value v);
 
 #ifdef __cplusplus
 }
