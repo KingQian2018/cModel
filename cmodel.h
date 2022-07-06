@@ -37,7 +37,7 @@ extern "C"
 #undef T
 
     extern const char *_loginfo[];
-    
+
 #ifdef __cplusplus
 }
 #endif

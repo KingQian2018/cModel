@@ -18,7 +18,12 @@ set(SEC_INC
     ./src/misc/
 )
 
-include_directories(${EASYLOGGER_INC} ${SEC_INC})
+set(TESTS_INC
+    ./tests/glad/include/
+    ./tests/glfw-3.3.7.bin.WIN64/include/
+)
+
+include_directories(${EASYLOGGER_INC} ${SEC_INC} ${TESTS_INC})
 
 add_subdirectory(component/easylogger/)
 add_subdirectory(component/cJson/)
