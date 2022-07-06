@@ -11,14 +11,6 @@ extern "C"
 #include <stdint.h>
 #include <stdlib.h>
 
-#define CMODEL_TYPE \
-    T(NONE)         \
-    T(CONST)        \
-    T(TRANSLATE)    \
-    T(LIMIT)        \
-    T(SWITCH)       \
-    T(GAIN)         \
-    T(PID)
 #define T(typ) CMODEL_##typ,
     typedef enum
     {
@@ -67,6 +59,7 @@ extern "C"
     CMODEL_STATUS_e cm_deleate(CModel *cm);
     CMODEL_STATUS_e cm_commonDeleatePar(CModel cm);
     CMODEL_STATUS_e cm_run(unsigned int dt);
+    CModel cm_getModelByID(unsigned int id);
     CMODEL_STATUS_e cm_showAll(CModel cm);
     CMODEL_STATUS_e cm_showPin(CModel cm, IOTYP_e type, IOPIN_e pin);
     a_value cm_getAPin(CModel cm, IOPIN_e pin, IOTYP_e type);

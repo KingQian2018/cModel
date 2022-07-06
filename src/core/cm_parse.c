@@ -10,14 +10,14 @@
  */
 
 #include "cm_parse.h"
-#include "../component/cJson/cJSON_Utils.h"
 
 #define LOG_TAG "Parse_Json"
 #include "cm_log.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-char *read_file(const char *filename)
+
+static char *read_file(const char *filename)
 {
     FILE *file = NULL;
     long length = 0;
@@ -72,17 +72,128 @@ cleanup:
     return content;
 }
 
-// CModel *_PID;
-CModel *_CMODELS;
-// CModel parse_PID(const cJSON *par, unsigned char idx)
-// {
-//     return pid_create(cJSON_GetNumberValue(cJSON_GetObjectItem(par, "id")),
-//                       cJSON_GetNumberValue(cJSON_GetObjectItem(par, "dt")));
-// }
-
-#include "auto_generate.h"
+#include "auto_generate_prase.c"
 #include <string.h>
-CMODEL_STATUS_e prase_model(const cJSON *par)
+
+static CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON *pars)
+{
+    CModel cm = cm_getModelByID(id);
+    cJSON *tmp = NULL;
+    cJSON *tmp1 = NULL;
+    cJSON *tmp2 = NULL;
+    if (cm == NULL)
+    {
+        LOG_E("Donot get %d model.", id);
+        return CMODEL_STATUS_CM_FINDNONE;
+    }
+
+    tmp = cJSON_GetObjectItem(pars, "KP");
+    float p = tmp == NULL ? 0.0f : (float)cJSON_GetNumberValue(tmp);
+    tmp = cJSON_GetObjectItem(pars, "KI");
+    float i = tmp == NULL ? 0.0f : (float)cJSON_GetNumberValue(tmp);
+    tmp = cJSON_GetObjectItem(pars, "KD");
+    float d = tmp == NULL ? 0.0f : (float)cJSON_GetNumberValue(tmp);
+    pid_setPID(cm, p, i, d);
+    LOG_I("Model PID %d, kp: %.3f, ki: %.3f, kd: %.3f.", id, p, i, d);
+
+    tmp = cJSON_GetObjectItem(pars, "SP");
+    if (tmp == NULL)
+    {
+        pid_setSP(cm, 0, 0);
+    }
+    else
+    {
+        tmp1 = cJSON_GetObjectItem(tmp, "Biase");
+        tmp2 = cJSON_GetObjectItem(tmp, "Gain");
+        float Biase = tmp1 == NULL ? 0 : (float)cJSON_GetNumberValue(tmp1);
+        float Gain = tmp2 == NULL ? 0 : (float)cJSON_GetNumberValue(tmp2);
+        pid_setSP(cm, Biase, Gain);
+        LOG_I("SP-Biase: %.3f, Gain: %.3f.", Biase, Gain);
+    }
+
+    tmp = cJSON_GetObjectItem(pars, "PV");
+    if (tmp == NULL)
+    {
+        pid_setPV(cm, 0, 0);
+    }
+    else
+    {
+        tmp1 = cJSON_GetObjectItem(tmp, "Biase");
+        tmp2 = cJSON_GetObjectItem(tmp, "Gain");
+        float Biase = tmp1 == NULL ? 0 : (float)cJSON_GetNumberValue(tmp1);
+        float Gain = tmp2 == NULL ? 0 : (float)cJSON_GetNumberValue(tmp2);
+        pid_setPV(cm, Biase, Gain);
+        LOG_I("PV-Biase: %.3f, Gain: %.3f.", Biase, Gain);
+    }
+
+    tmp = cJSON_GetObjectItem(pars, "Limit");
+    if (tmp == NULL)
+    {
+        pid_setLimit(cm, 0, 0);
+    }
+    else
+    {
+        tmp1 = cJSON_GetObjectItem(tmp, "h");
+        tmp2 = cJSON_GetObjectItem(tmp, "l");
+        float h = tmp1 == NULL ? 0 : (float)cJSON_GetNumberValue(tmp1);
+        float l = tmp2 == NULL ? 0 : (float)cJSON_GetNumberValue(tmp2);
+        pid_setLimit(cm, h, l);
+        LOG_I("Limit-h: %.3f, l: %.3f.", h, l);
+    }
+    return CMODEL_STATUS_OK;
+}
+
+static CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON *pars)
+{
+    CModel cm = cm_getModelByID(id);
+    cJSON *tmp = NULL;
+    cJSON *tmp1 = NULL;
+    cJSON *tmp2 = NULL;
+    if (cm == NULL)
+    {
+        LOG_E("Donot get %d model.", id);
+        return CMODEL_STATUS_CM_FINDNONE;
+    }
+    tmp = cJSON_GetObjectItem(pars, "TargetT");
+    uint32_t v = tmp == NULL ? 0 : (uint32_t)cJSON_GetNumberValue(tmp);
+    const_setTargetT(cm, v);
+
+    tmp = cJSON_GetObjectItem(pars, "Value");
+    a_value value = tmp == NULL ? 0 : (a_value)cJSON_GetNumberValue(tmp);
+    const_setValue(cm, value);
+    LOG_I("Model CONST %d, TargetT: %d, Value: %.3f.", id, v, value);
+
+    return CMODEL_STATUS_OK;
+}
+
+static CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON *pars)
+{
+    return CMODEL_STATUS_OK;
+}
+
+static CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON *pars)
+{
+    return CMODEL_STATUS_OK;
+}
+
+static CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON *pars)
+{
+    return CMODEL_STATUS_OK;
+}
+
+static CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON *pars)
+{
+    return CMODEL_STATUS_OK;
+}
+
+/**
+ * @brief 通过cJSON文件解析模型
+ *
+ * @param par cJSON文件
+ * @return CMODEL_STATUS_OK 创建成功
+ * @return CMODEL_STATUS_CM_CREATE 创建失败
+ */
+static CMODEL_STATUS_e prase_model(const cJSON *par)
 {
     for (unsigned int i = 0; i < Prase_Datas_len; i++)
     {
@@ -96,11 +207,21 @@ CMODEL_STATUS_e prase_model(const cJSON *par)
                 unsigned int id = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "id"));
                 unsigned int dt = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "dt"));
                 if (Prase_Datas[i].createCB(id, dt) == NULL)
-                {
+                { // create model
                     LOG_E("%s: Parse Model Error.", Prase_Datas[i].name);
                     return CMODEL_STATUS_CM_CREATE;
                 }
                 LOG_I("%s create. id: %d,dt: %d", Prase_Datas[i].name, id, dt);
+
+                cJSON *pars = cJSON_GetObjectItem(arrayItem, "pars");
+                if (pars != NULL)
+                {
+                    if (Prase_Datas[i].parsCB(id, pars) != CMODEL_STATUS_OK)
+                    { // set pars
+                        LOG_E("%s: Parse Model Pars Error.", Prase_Datas[i].name);
+                        return CMODEL_STATUS_CM_CREATEPAR;
+                    }
+                }
             }
         }
     }
@@ -131,43 +252,21 @@ CMODEL_STATUS_e parse_file(const char *cm_file)
     if (f == NULL)
     {
         LOG_E("Failed to read %s.", cm_file);
-        return CMODEL_STATUS_PS_FAILFILE;
+        goto fail_parse;
     }
     parsed = cJSON_Parse(f);
     if (parsed == NULL)
     {
-        LOG_E("Failed to parse: %s.", cm_file);
+        LOG_E("Failed to parse file: %s.", cm_file);
         goto fail_parse;
     }
 
     //... parse json datas
-    prase_model(parsed);
-    // cmodel = cJSON_GetObjectItem(parsed, "PID");
-    // if (cmodel == NULL)
-    // {
-    //     LOG_E("Failed to parse cmodel.");
-    //     goto fail_parse;
-    // }
-    // else
-    // {
-    //     unsigned char cmodel_size = 0;
-    //     cmodel_size = cJSON_GetArraySize(cmodel);
-    //     LOG_I("cmodel: PID, sum: %d", cmodel_size);
-    //     _PID = (CModel *)calloc(cmodel_size, sizeof(CModel));
-    //     if (_PID == NULL)
-    //     {
-    //         LOG_E("Failed to create _PIDs.");
-    //         goto fail_parse;
-    //     }
-    //     for (unsigned char i = 0; i < cmodel_size; i++)
-    //     {
-    //         if (parse_PID(cJSON_GetArrayItem(cmodel, i), i) != CMODEL_STATUS_OK)
-    //         {
-    //             LOG_E("Failed to create cmodel.");
-    //             goto fail_parse;
-    //         }
-    //     }
-    // }
+    if (prase_model(parsed) != CMODEL_STATUS_OK)
+    {
+        LOG_E("Failed to parse model.");
+        goto fail_parse;
+    }
 
     free(f);
     cJSON_Delete(parsed);

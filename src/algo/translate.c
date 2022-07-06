@@ -1,6 +1,5 @@
 #include "translate.h"
 #include <memory.h>
-#include "cm_log.h"
 
 #if CM_TRANSLATE
 
@@ -8,6 +7,7 @@
 #define LOG_TAG "TRANSLATE"
 #endif
 
+#include "cm_log.h"
 const static char *name = "TRANSLATE";
 
 /// 模块状态结构体

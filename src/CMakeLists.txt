@@ -3,7 +3,7 @@ set(SRC_C
     ./core/cm_parse.c
     ./core/io_port.c
     ./core/cm.c
-    ./core/auto_generate.c
+    ./core/auto_generate_prase.c
     ./algo/pid.c
     ./algo/const.c
     ./algo/translate.c

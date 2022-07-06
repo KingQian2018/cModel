@@ -167,6 +167,30 @@ CMODEL_STATUS_e cm_setLink(IOTYP_e type, CModel cmSrc, IOPIN_e pinSrc, CModel cm
     }
 }
 
+/**
+ * @brief 根据id查找模块
+ * 
+ * @param id 
+ * @return CModel 
+ */
+CModel cm_getModelByID(unsigned int id)
+{
+    CModel *tmp = &_register;
+    if (tmp[0] == NULL)
+    {
+        return NULL;
+    }
+    while (tmp[0] != NULL)
+    {
+        if(tmp[0]->id == id)
+        {
+            return tmp[0];
+        }
+        tmp = &(tmp[0]->next);
+    }
+    return NULL;
+}
+
 #include <stdio.h>
 /**
  * @brief 显示指定模块数据

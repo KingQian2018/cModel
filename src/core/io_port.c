@@ -4,9 +4,9 @@
  * @brief 引脚核心
  * @version 0.1
  * @date 2022-07-03
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 #include <stdlib.h> //< MDK
 #include <stdio.h>
@@ -25,10 +25,10 @@
 
 /**
  * @brief IO模块 实例化
- * 
+ *
  * @param io 指向IO模块的指针
  * @param num IO引脚数量，分别对应AI, DI, AO, DO
- * @return CMODEL_STATUS_OK	IO模块实例化成功 
+ * @return CMODEL_STATUS_OK	IO模块实例化成功
  * @return CMODEL_STATUS_IO_ERR	IO模块实例化失败。由于需要实例化的IO模块非空
  * @return CMODEL_STATUS_IO_FILE
  * 			1. IO模块动态分配空间失败
@@ -132,12 +132,12 @@ CMODEL_STATUS_e IO_Deleate(IO io)
 
 /**
  * @brief IO模块输入引脚建立连接
- * 
+ *
  * @param io IO模块指针
  * @param type IO模块类型枚举量
  * @param pin IO模块引脚类型枚举量
  * @param pValue 指向变量的指针，注意此处其变量类型为空，在程序内部对其进行了处理
- * @return CMODEL_STATUS_OK	引脚建立成功 
+ * @return CMODEL_STATUS_OK	引脚建立成功
  * @return CMODEL_STATUS_IO_ERR
  * 		1. 需要建立的引脚非 AI、DI 类型
  * 		2. 需要建立的引脚数量越界
@@ -175,7 +175,7 @@ CMODEL_STATUS_e IO_setLink(IO io, const IOTYP_e type, const IOPIN_e pin, void *p
 
 /**
  * @brief 获取模块模拟量数值
- * 
+ *
  * @param io IO模块指针
  * @param num IO模块引脚类型枚举量
  * @param type IO模块类型枚举量
@@ -218,7 +218,7 @@ a_value IO_GetAValue(IO io, IOPIN_e num, IOTYP_e type)
 
 /**
  * @brief 获取模块数字量数值
- * 
+ *
  * @param io IO模块指针
  * @param num IO模块引脚类型枚举量
  * @param type IO模块类型枚举量
@@ -261,7 +261,7 @@ d_value IO_GetDValue(IO io, IOPIN_e num, IOTYP_e type)
 
 /**
  * @brief 获取模块模拟量输出指针
- * 
+ *
  * @param io IO模块指针
  * @param pin IO模块引脚类型枚举量
  * @return a_value* 对应模块模拟量输出指针
@@ -279,7 +279,7 @@ a_value *IO_GetAOPoint(IO io, IOPIN_e pin)
 
 /**
  * @brief 获取模块数字量输出指针
- * 
+ *
  * @param io IO模块指针
  * @param pin IO模块引脚类型枚举量
  * @return d_value* 对应模块数字量输出指针
@@ -297,7 +297,7 @@ d_value *IO_GetDOPoint(IO io, IOPIN_e pin)
 
 /**
  * @brief 描述：获取模块状态
- * 
+ *
  * @param io IO模块指针
  * @return CMODEL_STATUS_e 模块状态
  */
@@ -308,11 +308,11 @@ CMODEL_STATUS_e IO_GetIOFlg(IO io)
 
 /**
  * @brief 设置模块模拟量输出值
- * 
+ *
  * @param io IO模块指针
  * @param pin IO模块引脚类型枚举量
  * @param fVal 输出值
- * @return CMODEL_STATUS_OK	设置成功 
+ * @return CMODEL_STATUS_OK	设置成功
  * @return CMODEL_STATUS_IO_ERR	设置出错。模拟量输出引脚越界
  */
 CMODEL_STATUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
@@ -328,7 +328,7 @@ CMODEL_STATUS_e IO_SetAOValue(IO io, IOPIN_e pin, a_value fVal)
 
 /**
  * @brief 设置模块数字量输出值
- * 
+ *
  * @param io IO模块指针
  * @param pin IO模块引脚类型枚举量
  * @param ucVal 输出值
@@ -348,22 +348,26 @@ CMODEL_STATUS_e IO_SetDOValue(IO io, IOPIN_e pin, d_value ucVal)
 
 /**
  * @brief 显示模块引脚数值
- * 
+ *
  * @param io 引脚
  */
 void IO_ShowALL(IO io)
 {
 	printf("\n\t======Model AI-%d DI-%d AO-%d DO-%d======\n", io->I.ANum, io->I.DNum, io->O.ANum, io->O.DNum);
-	for (unsigned char pin = 0; pin < io->I.ANum; pin++)
+	unsigned char _pin_max = io->I.ANum > io->O.ANum ? io->I.ANum : io->O.ANum;
+	for (unsigned char pin = 0; pin < _pin_max; pin++)
 	{
 		printf("\t");
-		if (io->I.ppA[pin] != 0)
+		if (io->I.ppA != NULL)
 		{
-			printf("%.3f\t==>A%d\t\t", io->I.ppA[pin][0], pin + 1);
-		}
-		else
-		{
-			printf("None\t==>A%d\t\t", pin + 1);
+			if (io->I.ppA[pin] != 0)
+			{
+				printf("%.3f\t==>A%d\t\t", io->I.ppA[pin][0], pin + 1);
+			}
+			else
+			{
+				printf("None\t==>A%d\t\t", pin + 1);
+			}
 		}
 		if (pin < io->O.ANum)
 		{
@@ -371,16 +375,20 @@ void IO_ShowALL(IO io)
 		}
 		printf("\n");
 	}
-	for (unsigned char pin = 0; pin < io->I.DNum; pin++)
+	_pin_max = io->I.DNum > io->O.DNum ? io->I.DNum : io->O.DNum;
+	for (unsigned char pin = 0; pin < _pin_max; pin++)
 	{
 		printf("\t");
-		if (io->I.ppD[pin] != 0)
+		if (io->I.ppD != NULL)
 		{
-			printf("%d\t-->D%d\t\t", io->I.ppD[pin][0], pin + 1);
-		}
-		else
-		{
-			printf("None\t-->D%d\t\t", pin + 1);
+			if (io->I.ppD[pin] != 0)
+			{
+				printf("%d\t-->D%d\t\t", io->I.ppD[pin][0], pin + 1);
+			}
+			else
+			{
+				printf("None\t-->D%d\t\t", pin + 1);
+			}
 		}
 		if (pin < io->O.DNum)
 		{
@@ -392,7 +400,7 @@ void IO_ShowALL(IO io)
 
 /**
  * @brief 显示模块指定引脚数值
- * 
+ *
  * @param io IO模块指针
  * @param type IO模块类型枚举量
  * @param pin IO模块引脚类型枚举量
