@@ -8,17 +8,17 @@
 #include "switch.h"
 #include "translate.h"
 
-extern CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON* pars);
-extern CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON* pars);
-extern CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON* pars);
-extern CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON* pars);
-extern CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON* pars);
-extern CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_const_pars(CModel cm, const cJSON* pars);
+extern CMODEL_STATUS_e prase_translate_pars(CModel cm, const cJSON* pars);
+extern CMODEL_STATUS_e prase_limit_pars(CModel cm, const cJSON* pars);
+extern CMODEL_STATUS_e prase_switch_pars(CModel cm, const cJSON* pars);
+extern CMODEL_STATUS_e prase_gain_pars(CModel cm, const cJSON* pars);
+extern CMODEL_STATUS_e prase_pid_pars(CModel cm, const cJSON* pars);
 
 typedef struct _Prase_Datas_s {
 	 const char* name;
 	 CModel (*createCB)(uint32_t, uint32_t);
-	 CMODEL_STATUS_e (*parsCB)(uint32_t, const cJSON*);
+	 CMODEL_STATUS_e (*parsCB)(CModel, const cJSON*);
 }Prase_Datas_s;
 
 const Prase_Datas_s Prase_Datas[] = {

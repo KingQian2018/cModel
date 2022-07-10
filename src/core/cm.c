@@ -148,10 +148,10 @@ CMODEL_STATUS_e cm_run(unsigned int dt)
  * @brief 模块建立链接
  *
  * @param type 链接类型
- * @param cmSrc 源模块
- * @param pinSrc 源模块引脚
- * @param cmDst 目标模块
- * @param pinDst 目标模块引脚
+ * @param cmSrc 输入模块
+ * @param pinSrc 输入模块引脚
+ * @param cmDst 输出模块
+ * @param pinDst 输出模块引脚
  * @return CMODEL_STATUS_OK 建立成功
  * @return CMODEL_STATUS_IO_ERR 建立失败
  */

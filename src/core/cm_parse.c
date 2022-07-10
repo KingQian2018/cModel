@@ -75,26 +75,26 @@ cleanup:
 #include "auto_generate_prase.c"
 #include <string.h>
 
-CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON *pars)
+#define CJSON_GETVALUE(pars, type, value)                          \
+    type value = 0;                                                \
+    {                                                              \
+        cJSON *tmp = NULL;                                         \
+        tmp = NULL;                                                \
+        tmp = cJSON_GetObjectItem(pars, #value);                   \
+        value = tmp == NULL ? 0 : (type)cJSON_GetNumberValue(tmp); \
+    }
+CMODEL_STATUS_e prase_pid_pars(CModel cm, const cJSON *pars)
 {
-    CModel cm = cm_getModelByID(id);
     cJSON *tmp = NULL;
     cJSON *tmp1 = NULL;
     cJSON *tmp2 = NULL;
-    if (cm == NULL)
-    {
-        LOG_E("Donot get %d model.", id);
-        return CMODEL_STATUS_CM_FINDNONE;
-    }
 
-    tmp = cJSON_GetObjectItem(pars, "KP");
-    float p = tmp == NULL ? 0.0f : (float)cJSON_GetNumberValue(tmp);
-    tmp = cJSON_GetObjectItem(pars, "KI");
-    float i = tmp == NULL ? 0.0f : (float)cJSON_GetNumberValue(tmp);
-    tmp = cJSON_GetObjectItem(pars, "KD");
-    float d = tmp == NULL ? 0.0f : (float)cJSON_GetNumberValue(tmp);
-    pid_setPID(cm, p, i, d);
-    LOG_I("Model PID %d, kp: %.3f, ki: %.3f, kd: %.3f.", id, p, i, d);
+    CJSON_GETVALUE(pars, float, KP);
+    CJSON_GETVALUE(pars, float, KI);
+    CJSON_GETVALUE(pars, float, KD);
+
+    pid_setPID(cm, KP, KI, KD);
+    LOG_I("Model PID %d, kp: %.3f, ki: %.3f, kd: %.3f.", cm->id, KP, KI, KD);
 
     tmp = cJSON_GetObjectItem(pars, "SP");
     if (tmp == NULL)
@@ -143,45 +143,45 @@ CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON *pars)
     return CMODEL_STATUS_OK;
 }
 
-CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_const_pars(CModel cm, const cJSON *pars)
 {
-    CModel cm = cm_getModelByID(id);
     cJSON *tmp = NULL;
-    cJSON *tmp1 = NULL;
-    cJSON *tmp2 = NULL;
-    if (cm == NULL)
-    {
-        LOG_E("Donot get %d model.", id);
-        return CMODEL_STATUS_CM_FINDNONE;
-    }
-    tmp = cJSON_GetObjectItem(pars, "TargetT");
-    uint32_t v = tmp == NULL ? 0 : (uint32_t)cJSON_GetNumberValue(tmp);
-    const_setTargetT(cm, v);
 
-    tmp = cJSON_GetObjectItem(pars, "Value");
-    a_value value = tmp == NULL ? 0 : (a_value)cJSON_GetNumberValue(tmp);
-    const_setValue(cm, value);
-    LOG_I("Model CONST %d, TargetT: %d, Value: %.3f.", id, v, value);
+    CJSON_GETVALUE(pars, uint32_t, TargetT);
+    CJSON_GETVALUE(pars, a_value, Value);
+
+    const_setTargetT(cm, TargetT);
+    const_setValue(cm, Value);
+    LOG_I("Model CONST %d, TargetT: %d, Value: %.3f.",
+          cm->id, TargetT, Value);
 
     return CMODEL_STATUS_OK;
 }
 
-CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_translate_pars(CModel cm, const cJSON *pars)
+{
+    CJSON_GETVALUE(pars, float, K);
+    CJSON_GETVALUE(pars, uint32_t, T);
+    CJSON_GETVALUE(pars, short, n);
+    CJSON_GETVALUE(pars, float, Tao);
+
+    translate_setPar(cm, K, T, n, Tao);
+    LOG_I("Model Translate %d, K: %.3f, T: %.3f, n: %d, Tao: %.3f.",
+          cm->id, K, T, n, Tao);
+    return CMODEL_STATUS_OK;
+}
+
+CMODEL_STATUS_e prase_limit_pars(CModel cm, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }
 
-CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_gain_pars(CModel cm, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }
 
-CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON *pars)
-{
-    return CMODEL_STATUS_OK;
-}
-
-CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_switch_pars(CModel cm, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }
@@ -206,7 +206,8 @@ static CMODEL_STATUS_e prase_model(const cJSON *par)
                 cJSON *arrayItem = cJSON_GetArrayItem(model, model_idx);
                 unsigned int id = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "id"));
                 unsigned int dt = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "dt"));
-                if (Prase_Datas[i].createCB(id, dt) == NULL)
+                CModel cm = NULL;
+                if ((cm = Prase_Datas[i].createCB(id, dt)) == NULL)
                 { // create model
                     LOG_E("%s: Parse Model Error.", Prase_Datas[i].name);
                     return CMODEL_STATUS_CM_CREATE;
@@ -216,7 +217,7 @@ static CMODEL_STATUS_e prase_model(const cJSON *par)
                 cJSON *pars = cJSON_GetObjectItem(arrayItem, "pars");
                 if (pars != NULL)
                 {
-                    if (Prase_Datas[i].parsCB(id, pars) != CMODEL_STATUS_OK)
+                    if (Prase_Datas[i].parsCB(cm, pars) != CMODEL_STATUS_OK)
                     { // set pars
                         LOG_E("%s: Parse Model Pars Error.", Prase_Datas[i].name);
                         return CMODEL_STATUS_CM_CREATEPAR;
@@ -225,6 +226,97 @@ static CMODEL_STATUS_e prase_model(const cJSON *par)
             }
         }
     }
+    for (unsigned char i = 0; i < Prase_Datas_len; i++)
+    { // Model Link
+        cJSON *model = cJSON_GetObjectItem(par, Prase_Datas[i].name);
+        unsigned char model_cnt = cJSON_GetArraySize(model);
+        for (unsigned char model_idx = 0; model_idx < model_cnt; model_idx++)
+        {
+            cJSON *arrayItem = cJSON_GetArrayItem(model, model_idx);
+            unsigned int _iid = cJSON_GetNumberValue(cJSON_GetObjectItem(arrayItem, "id"));
+            cJSON *links = cJSON_GetObjectItem(arrayItem, "links");
+            if (links != NULL)
+            {
+                cJSON *AD = cJSON_GetObjectItem(links, "A");
+                if (AD != NULL)
+                { // Link AO and AI
+                    unsigned char link_cnt = cJSON_GetArraySize(AD);
+                    for (unsigned char link_idx = 0; link_idx < link_cnt; link_idx++)
+                    {
+                        cJSON *link = cJSON_GetArrayItem(AD, link_idx);
+                        if (link != NULL)
+                        {
+                            cJSON *l_i = cJSON_GetObjectItem(link, "I");
+                            cJSON *l_id = cJSON_GetObjectItem(link, "id");
+                            cJSON *l_o = cJSON_GetObjectItem(link, "O");
+                            if (l_i == NULL ||
+                                l_id == NULL ||
+                                l_o == NULL)
+                            {
+                                LOG_E("Prase Link A Error.");
+                                return CMODEL_STATUS_PS_FAILPARSE;
+                            }
+                            else
+                            {
+                                IOPIN_e _i = (IOPIN_e)cJSON_GetNumberValue(l_i);
+                                unsigned int _id = (unsigned int)cJSON_GetNumberValue(l_id);
+                                IOPIN_e _o = (IOPIN_e)cJSON_GetNumberValue(l_o);
+                                CModel cmi = cm_getModelByID(_iid);
+                                CModel cmo = cm_getModelByID(_id);
+                                if (cmi == NULL || cmo == NULL)
+                                {
+                                    LOG_E("Failed to get model.");
+                                    return CMODEL_STATUS_CM_NULL;
+                                }
+                                cm_setLink(IOTYP_AI, cmi, _i, cmo, _o);
+                                LOG_I("Link %s %d AI%d to %s %d AO%d.", cmo->name, cmo->id, _o,
+                                      cmi->name, cmi->id, _i);
+                            }
+                        }
+                    }
+                }
+                AD = cJSON_GetObjectItem(links, "D");
+                if (AD != NULL)
+                { // Link DO and DI
+                    unsigned char link_cnt = cJSON_GetArraySize(AD);
+                    for (unsigned char link_idx = 0; link_idx < link_cnt; link_idx++)
+                    {
+                        cJSON *link = cJSON_GetArrayItem(AD, link_idx);
+                        if (link != NULL)
+                        {
+                            cJSON *l_i = cJSON_GetObjectItem(link, "I");
+                            cJSON *l_id = cJSON_GetObjectItem(link, "id");
+                            cJSON *l_o = cJSON_GetObjectItem(link, "O");
+                            if (l_i == NULL ||
+                                l_id == NULL ||
+                                l_o == NULL)
+                            {
+                                LOG_E("Prase Link D Error.");
+                                return CMODEL_STATUS_PS_FAILPARSE;
+                            }
+                            else
+                            {
+                                IOPIN_e _i = (IOPIN_e)cJSON_GetNumberValue(l_i);
+                                unsigned int _id = (unsigned int)cJSON_GetNumberValue(l_id);
+                                IOPIN_e _o = (IOPIN_e)cJSON_GetNumberValue(l_o);
+                                CModel cmi = cm_getModelByID(_iid);
+                                CModel cmo = cm_getModelByID(_id);
+                                if (cmi == NULL || cmo == NULL)
+                                {
+                                    LOG_E("Failed to get model.");
+                                    return CMODEL_STATUS_CM_NULL;
+                                }
+                                cm_setLink(IOTYP_DI, cmi, _i, cmo, _o);
+                                LOG_I("Link %s %d DI%d to %s %d DO%d.", cmo->name, cmo->id, _o,
+                                      cmi->name, cmi->id, _i);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return CMODEL_STATUS_OK;
 }
 

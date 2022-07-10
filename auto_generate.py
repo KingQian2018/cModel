@@ -37,13 +37,13 @@ with open(auto_file_c, 'w', encoding='utf-8') as f:
     for tm in target_model:
         tm = str.lower(tm)
         f.write("extern CMODEL_STATUS_e prase_"+tm +
-                "_pars(unsigned int id, const cJSON* pars);\n")
+                "_pars(CModel cm, const cJSON* pars);\n")
     f.write("\n")
 
     f.write("typedef struct _Prase_Datas_s {\n")
     f.write("\t const char* name;\n")
     f.write("\t CModel (*createCB)(uint32_t, uint32_t);\n")
-    f.write("\t CMODEL_STATUS_e (*parsCB)(uint32_t, const cJSON*);\n")
+    f.write("\t CMODEL_STATUS_e (*parsCB)(CModel, const cJSON*);\n")
     f.write("}Prase_Datas_s;\n")
     f.write("\n")
 

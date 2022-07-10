@@ -67,7 +67,7 @@ static void run_test()
     pthread_t th, timer;
     FILE *fSerial;
     TEST_ASSERT_MESSAGE((fSerial = fopen("COM2", "wb+")) != NULL, "Filed to open COM2");
-    int arg = 2000;
+    int arg = 50000;
     int ret = pthread_create(&th, NULL, _run, &arg);
     int *thread_ret = NULL;
     TEST_ASSERT_MESSAGE(ret == 0, "Create thread error!");

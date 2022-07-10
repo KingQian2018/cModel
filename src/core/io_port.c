@@ -355,8 +355,10 @@ void IO_ShowALL(IO io)
 {
 	printf("\n\t======Model AI-%d DI-%d AO-%d DO-%d======\n", io->I.ANum, io->I.DNum, io->O.ANum, io->O.DNum);
 	unsigned char _pin_max = io->I.ANum > io->O.ANum ? io->I.ANum : io->O.ANum;
+	unsigned char flag = 0;
 	for (unsigned char pin = 0; pin < _pin_max; pin++)
 	{
+		flag = 0;
 		printf("\t");
 		if (io->I.ppA != NULL)
 		{
@@ -368,9 +370,14 @@ void IO_ShowALL(IO io)
 			{
 				printf("None\t==>A%d\t\t", pin + 1);
 			}
+			flag = 1;
 		}
 		if (pin < io->O.ANum)
 		{
+			if (flag == 0)
+			{
+				printf("\t\t\t");
+			}
 			printf("A%d==>\t%.3f", pin + 1, io->O.pA[pin]);
 		}
 		printf("\n");
@@ -378,6 +385,7 @@ void IO_ShowALL(IO io)
 	_pin_max = io->I.DNum > io->O.DNum ? io->I.DNum : io->O.DNum;
 	for (unsigned char pin = 0; pin < _pin_max; pin++)
 	{
+		flag = 0;
 		printf("\t");
 		if (io->I.ppD != NULL)
 		{
@@ -392,6 +400,10 @@ void IO_ShowALL(IO io)
 		}
 		if (pin < io->O.DNum)
 		{
+			if (flag == 0)
+			{
+				printf("\t\t\t");
+			}
 			printf("D%d-->\t%d", pin + 1, io->O.pD[pin]);
 		}
 		printf("\n");
