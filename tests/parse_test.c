@@ -30,7 +30,8 @@ static void *_run(void *arg)
 
 static void *_timer(void *arg)
 {
-    int *v = (int *)arg;
+    char tmp[256];
+    FILE *v = (FILE *)arg;
     unsigned char idx = 1;
     CModel cm = cm_getModelByID(idx);
     while (cm != NULL)
@@ -42,11 +43,21 @@ static void *_timer(void *arg)
 
     while (true)
     {
-        Sleep(v[0]);
-        for (unsigned char i = 1; i < idx; i++)
+        Sleep(10);
+        fwrite(tmp, sprintf(tmp, "$"), 1, v);
+        for (unsigned char i = 0; i < idx; i++)
         {
-            cm_showAll(cm_getModelByID(i));
+            CModel cmShow = cm_getModelByID(i);
+            if (cmShow != NULL)
+            {
+                for (unsigned char pinIdx = 0; pinIdx < cmShow->io->O.ANum; pinIdx++)
+                {
+                    a_value av = IO_GetAValue(cmShow->io, pinIdx, IOTYP_AO);
+                    fwrite(tmp, sprintf(tmp, "%.3f ", av), 1, v);
+                }
+            }
         }
+        fwrite(tmp, sprintf(tmp, "0;"), 1, v);
     }
     return 0;
 }
@@ -54,85 +65,23 @@ static void *_timer(void *arg)
 static void run_test()
 {
     pthread_t th, timer;
+    FILE *fSerial;
+    TEST_ASSERT_MESSAGE((fSerial = fopen("COM2", "wb+")) != NULL, "Filed to open COM2");
     int arg = 2000;
     int ret = pthread_create(&th, NULL, _run, &arg);
     int *thread_ret = NULL;
     TEST_ASSERT_MESSAGE(ret == 0, "Create thread error!");
-    int timer_arg = 1000;
-    ret = pthread_create(&timer, NULL, _timer, &timer_arg);
+    ret = pthread_create(&timer, NULL, _timer, fSerial);
     TEST_ASSERT_MESSAGE(ret == 0, "Create timer error!");
     pthread_join(th, (void **)&thread_ret);
-}
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
-}
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-static int run_graphic()
-{
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // glfw创建窗口
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
-    {
-        printf("创建窗口失败");
-        //终止
-        glfwTerminate();
-        return -1;
-    }
-    //设置当前OpenGL上下文
-    glfwMakeContextCurrent(window);
-
-    //设置回调，当窗口大小调整后将调用该回调函数
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    //设置回调，当发生按键操作时将调用该回调函数
-    glfwSetKeyCallback(window, key_callback);
-
-    // glad初始化
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        printf("加载失败");
-        return -1;
-    }
-
-    // 使用循环达到循环渲染效果
-    while (!glfwWindowShouldClose(window))
-    {
-        //检查事件
-        glfwPollEvents();
-
-        //渲染指令
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        //交换缓冲
-        glfwSwapBuffers(window);
-    }
-
-    //终止渲染 关闭并清理glfw本地资源
-    glfwTerminate();
-    return 0;
+    fclose(fSerial);
 }
 
 int main(void)
 {
     cm_elog_init();
-    // UNITY_BEGIN();
-    // RUN_TEST(parse_test1);
-    // RUN_TEST(run_test);
-    // return UNITY_END();
-    return run_graphic();
+    UNITY_BEGIN();
+    RUN_TEST(parse_test1);
+    RUN_TEST(run_test);
+    return UNITY_END();
 }

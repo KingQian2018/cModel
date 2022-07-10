@@ -75,7 +75,7 @@ cleanup:
 #include "auto_generate_prase.c"
 #include <string.h>
 
-static CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON *pars)
 {
     CModel cm = cm_getModelByID(id);
     cJSON *tmp = NULL;
@@ -143,7 +143,7 @@ static CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON *pars)
     return CMODEL_STATUS_OK;
 }
 
-static CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON *pars)
 {
     CModel cm = cm_getModelByID(id);
     cJSON *tmp = NULL;
@@ -166,22 +166,22 @@ static CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON *pars)
     return CMODEL_STATUS_OK;
 }
 
-static CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }
 
-static CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }
 
-static CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }
 
-static CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON *pars)
+CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON *pars)
 {
     return CMODEL_STATUS_OK;
 }

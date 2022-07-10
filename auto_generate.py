@@ -36,7 +36,7 @@ with open(auto_file_c, 'w', encoding='utf-8') as f:
 
     for tm in target_model:
         tm = str.lower(tm)
-        f.write("static CMODEL_STATUS_e prase_"+tm +
+        f.write("extern CMODEL_STATUS_e prase_"+tm +
                 "_pars(unsigned int id, const cJSON* pars);\n")
     f.write("\n")
 

@@ -1,9 +1,7 @@
 #include "common.h"
 
 IO _io;
-#define SHOW_ITEMS (2)
-#define SHOW_NUMBER (5000)
-a_value temp[SHOW_ITEMS][SHOW_NUMBER];
+#define SHOW_NUMBER (50000)
 #include <string.h>
 
 static void _iotest(void)
@@ -83,6 +81,7 @@ static void _model_setLink(void)
     cm_setLink(IOTYP_AI, m_translate_2, IOPIN_1, m_translate_1, IOPIN_1); // obj
 }
 
+#include <windows.h>
 static void test()
 {
     elog_init();
@@ -98,24 +97,33 @@ static void test()
     _model_create();
     _model_set();
     _model_setLink();
-
     FILE *file = NULL;
-#define TEST_DIR_OUT "outputs/"
-    file = fopen(TEST_DIR_OUT "out.txt", "w");
-    TEST_ASSERT_NOT_NULL_MESSAGE(file, "failed to open " TEST_DIR_OUT "out.txt");
+    file = fopen("COM2", "wb+");
+    char tmp[256];
+    TEST_ASSERT_NOT_NULL_MESSAGE(file, "failed to open COM2");
+    uint32_t count = 0;
     if (file != NULL)
     {
-        for (uint32_t m = 0; m < SHOW_ITEMS; m++)
+
+        while (count < SHOW_NUMBER)
         {
-            fprintf(file, "\n");
-            for (uint32_t n = 0; n < SHOW_NUMBER; n++)
+            cm_run(1);
+            if (count == 5000)
             {
-                fprintf(file, "%.3f ", temp[m][n]);
+                const_setValue(m_const_1, -5.0f);
             }
+            fwrite(tmp, sprintf(tmp, "$"), 1, file);
+            fwrite(tmp, sprintf(tmp, "%.3f ", cm_getAPin(m_const_1, IOPIN_1, IOTYP_AO)), 1, file);
+            fwrite(tmp, sprintf(tmp, "%.3f ", cm_getAPin(m_pid_1, IOPIN_1, IOTYP_AO)), 1, file);
+            fwrite(tmp, sprintf(tmp, "%.3f ", cm_getAPin(m_translate_1, IOPIN_1, IOTYP_AO)), 1, file);
+            fwrite(tmp, sprintf(tmp, "%.3f ", cm_getAPin(m_pid_2, IOPIN_1, IOTYP_AO)), 1, file);
+            fwrite(tmp, sprintf(tmp, "%.3f", cm_getAPin(m_translate_2, IOPIN_1, IOTYP_AO)), 1, file);
+            fwrite(tmp, sprintf(tmp, ";"), 1, file);
+            count++;
+            Sleep(1);
         }
         fclose(file);
     }
-    cm_showAll(m_pid_1);
 }
 
 int main(void)

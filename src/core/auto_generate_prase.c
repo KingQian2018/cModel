@@ -8,12 +8,12 @@
 #include "switch.h"
 #include "translate.h"
 
-static CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON* pars);
-static CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON* pars);
-static CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON* pars);
-static CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON* pars);
-static CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON* pars);
-static CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_const_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_translate_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_limit_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_switch_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_gain_pars(unsigned int id, const cJSON* pars);
+extern CMODEL_STATUS_e prase_pid_pars(unsigned int id, const cJSON* pars);
 
 typedef struct _Prase_Datas_s {
 	 const char* name;
