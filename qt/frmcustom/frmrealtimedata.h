@@ -25,6 +25,7 @@ private:
     Ui::frmRealtimeData *ui;
     QTimer dataTimer;
     QTime timeStart;
+    unsigned int cm_cnt;
 
 private slots:
     void initForm();

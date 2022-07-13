@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainWindow)
 {
+    qcm.start();
     ui->setupUi(this);
     this->initForm();
     this->initNav();
@@ -17,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    qcm.stop();
+    qcm.quit();
+    qcm.wait();
     delete ui;
 }
 
