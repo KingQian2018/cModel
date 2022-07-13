@@ -9,7 +9,7 @@
 
 static void parse_test1()
 {
-#define PARSE_PATH "parse_test/cmodel.cm"
+#define PARSE_PATH "parse_test/cmodel.json"
     TEST_ASSERT_MESSAGE(parse_file(PARSE_PATH) == CMODEL_STATUS_OK, "parse failed.");
 }
 
@@ -19,7 +19,7 @@ static void *_run(void *arg)
     while (v[0]--)
     {
         cm_run(1);
-        if (v[0] % 100 == 0)
+        if (v[0] % 1000 == 0)
         {
             LOG_I("run %d", v[0]);
         }

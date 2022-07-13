@@ -20,7 +20,7 @@ file(COPY ${test_glfw} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
 
 link_directories("${PROJECT_SOURCE_DIR}/tests/glfw-3.3.7.bin.WIN64/lib-mingw-w64" )
 
-message(STATUS "KW: ${PROJECT_SOURCE_DIR}/tests/glfw-3.3.7.bin.WIN64/lib-mingw-w64")
+message(STATUS "tests: ${LIBS}")
 foreach(unity_test ${unity_tests})
     add_executable("${unity_test}" "${unity_test}.c")
     target_link_libraries("${unity_test}" "${LIBS}" unity)

@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5)
+
 project(cModel VERSION 0.1.0)
 
 include(CTest)
@@ -28,6 +29,7 @@ include_directories(${EASYLOGGER_INC} ${SEC_INC} ${TESTS_INC})
 add_subdirectory(component/easylogger/)
 add_subdirectory(component/cJson/)
 add_subdirectory(src/)
+add_subdirectory(qt)
 
 set(LIBS lib_src lib_cjson)
 add_custom_target(check
