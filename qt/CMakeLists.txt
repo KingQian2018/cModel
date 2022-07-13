@@ -46,12 +46,12 @@ endif()
 include_directories(frmcustom 3rd_qcustomplot 3rd_qcustomplot/v2_1)
 add_subdirectory(frmcustom)
 add_subdirectory(3rd_qcustomplot)
+add_subdirectory(qcmodel)
 target_link_libraries(PlotData
   lib_frmcustom
   lib_qcustomplot
   Qt5::Widgets
-  lib_src 
-  lib_cjson)
+  lib_qcmodel)
 message(STATUS "PlotData:${LIBS}")
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})

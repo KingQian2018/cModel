@@ -18,10 +18,10 @@
 #include "cm_log.h"
 
 /// 宏定义，判断是否为有效引脚
-#define IS_VALID_AI_PIN(io, p) (p <= (io->I.ANum) && p <= IOPIN_8)
-#define IS_VALID_AO_PIN(io, p) (p <= (io->O.DNum) && p <= IOPIN_8)
-#define IS_VALID_DI_PIN(io, p) (p <= (io->I.ANum) && p <= IOPIN_8)
-#define IS_VALID_DO_PIN(io, p) (p <= (io->O.DNum) && p <= IOPIN_8)
+#define IS_VALID_AI_PIN(io, p) ((unsigned char)p < (io->I.ANum) && p <= IOPIN_8)
+#define IS_VALID_AO_PIN(io, p) ((unsigned char)p < (io->O.ANum) && p <= IOPIN_8)
+#define IS_VALID_DI_PIN(io, p) ((unsigned char)p < (io->I.DNum) && p <= IOPIN_8)
+#define IS_VALID_DO_PIN(io, p) ((unsigned char)p < (io->O.DNum) && p <= IOPIN_8)
 
 /**
  * @brief IO模块 实例化

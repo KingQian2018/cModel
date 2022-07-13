@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <qtoolbutton.h>
 #include <qlayout.h>
+#include "qcmodel/qcmodel.h"
 class QAbstractButton;
 
 QT_BEGIN_NAMESPACE
@@ -31,6 +32,8 @@ private:
 
     QList<int> icons;
     QList<QAbstractButton *> btns;
+
+    qcmodel qcm;
     
 private slots:
     void initWidgets();
