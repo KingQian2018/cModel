@@ -14,7 +14,7 @@
 #if CM_USE_LOG
 #define CM_LOG_IO 1
 #define CM_LOG_CM 1
-#define CM_LOG_PARSE 1
+#define CM_LOG_PARSE 0
 #define CM_LOG_PID 1
 #define CM_LOG_CONST 1
 #define CM_LOG_TRANSLATE 1

@@ -11,7 +11,12 @@
 
 #include "cm_parse.h"
 
+#if CM_LOG_PARSE
 #define LOG_TAG "Parse_Json"
+#define LOG_LVL ELOG_LVL_VERBOSE
+#else
+#define LOG_LVL ELOG_LVL_ASSERT
+#endif
 #include "cm_log.h"
 
 #include <stdio.h>

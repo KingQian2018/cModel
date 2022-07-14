@@ -30,6 +30,7 @@ private:
 private slots:
     void initForm();
     void realtimeDataSlot();
+    void mousePress(QMouseEvent *event);
 };
 
 #endif // FRMREALTIMEDATA_H

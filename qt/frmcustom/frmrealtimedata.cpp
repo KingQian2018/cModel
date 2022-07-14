@@ -40,6 +40,7 @@ void frmRealtimeData::initForm()
 {
     // include this section to fully disable antialiasing for higher performance:
     ui->customPlot->setNotAntialiasedElements(QCP::aeAll);
+    ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables | QCP::iMultiSelect);
     QFont font;
     font.setStyleStrategy(QFont::NoAntialias);
     ui->customPlot->xAxis->setTickLabelFont(font);
@@ -64,6 +65,8 @@ void frmRealtimeData::initForm()
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
+
+    connect(ui->customPlot, SIGNAL(mousePress(QMouseEvent *)), this, SLOT(mousePress(QMouseEvent *)));
 }
 
 void frmRealtimeData::realtimeDataSlot()
@@ -94,14 +97,14 @@ void frmRealtimeData::realtimeDataSlot()
             }
         }
         // rescale value (vertical) axis to fit the current data:
-        ui->customPlot->graph(0)->rescaleValueAxis();
-        ui->customPlot->graph(1)->rescaleValueAxis(true);
+        // ui->customPlot->graph(0)->rescaleValueAxis();
+        // ui->customPlot->graph(1)->rescaleValueAxis(true);
 
         lastPointKey = key;
     }
 
     // make key axis range scroll with the data (at a constant range size of 8):
-    ui->customPlot->xAxis->setRange(key, 50, Qt::AlignRight);
+    // ui->customPlot->xAxis->setRange(key, 50, Qt::AlignRight);
     ui->customPlot->replot();
 
     // calculate frames per second:
@@ -116,5 +119,17 @@ void frmRealtimeData::realtimeDataSlot()
         ui->label->setText(info);
         lastFpsKey = key;
         frameCount = 0;
+    }
+}
+
+void frmRealtimeData::mousePress(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        ui->customPlot->setSelectionRectMode(QCP::srmNone);
+    }
+    else
+    {
+        ui->customPlot->setSelectionRectMode(QCP::srmZoom);
     }
 }

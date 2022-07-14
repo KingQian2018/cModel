@@ -14,7 +14,8 @@ file(GLOB test_parsefiles "parse_test/*")
 file(REMOVE test_parsefiles "parse_test/*")
 file(COPY ${test_parsefiles} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/parse_test/")
 
-message(STATUS "tests: ${LIBS}")
+message(STATUS "tests: parse files ${test_parsefiles}")
+
 foreach(unity_test ${unity_tests})
     add_executable("${unity_test}" "${unity_test}.c")
     target_link_libraries("${unity_test}" "${LIBS}" unity)
