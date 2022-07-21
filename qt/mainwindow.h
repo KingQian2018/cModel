@@ -33,8 +33,6 @@ private:
     QList<int> icons;
     QList<QAbstractButton *> btns;
 
-    qcmodel qcm;
-    
 private slots:
     void initWidgets();
     void initNav();         //初始化导航按钮

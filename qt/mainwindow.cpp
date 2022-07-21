@@ -5,22 +5,18 @@
 #include <frmrealtimedata.h>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::MainWindow)
+    : QWidget(parent), ui(new Ui::MainWindow)
 {
-    qcm.start();
     ui->setupUi(this);
-    this->initForm();
-    this->initNav();
-    this->initIcon();
-    ui->stackedWidget->addWidget(new frmRealtimeData);
+    initWidgets();
+    initForm();
+    initNav();
+    initIcon();
+    // ui->stackedWidget->addWidget(new frmRealtimeData);
 }
 
 MainWindow::~MainWindow()
 {
-    qcm.stop();
-    qcm.quit();
-    qcm.wait();
     delete ui;
 }
 
@@ -35,7 +31,19 @@ void MainWindow::showEvent(QShowEvent *)
 
 void MainWindow::initWidgets()
 {
+    QGraphicsScene *scene = new QGraphicsScene();
+    QGraphicsView *view = new QGraphicsView(scene);
+    QStringList pid_ai, pid_ao, pid_di, pid_do;
+    pid_ai << "SP"
+           << "PV"
+           << "FF";
+    pid_ao << "AO";
+    pid_di << "TR";
+    QCModel *pid = new QCModel(pid_ai, pid_ao, pid_di, pid_do, "PID");
+    scene->addItem(pid->body());
+    view->resize(ui->stackedWidget->width(), ui->stackedWidget->height());
     ui->stackedWidget->addWidget(new frmRealtimeData);
+    ui->stackedWidget->addWidget(view);
 }
 
 void MainWindow::initForm()
@@ -53,13 +61,15 @@ void MainWindow::initForm()
 }
 
 void MainWindow::initNav()
-{    
+{
     //按钮文字集合
     QStringList names;
-    names << "实时曲线";
+    names << "实时曲线"
+          << "模型界面";
 
     //自动生成按钮
-    for (int i = 0; i < names.count(); i++) {
+    for (int i = 0; i < names.count(); i++)
+    {
         QToolButton *btn = new QToolButton;
         //设置按钮固定高度
         btn->setFixedHeight(35);
@@ -83,6 +93,7 @@ void MainWindow::initNav()
     //底部加个弹簧
     QSpacerItem *verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->widgetLeft->layout()->addItem(verticalSpacer);
+    ui->stackedWidget->setCurrentIndex(names.count() - 1);
     btns.at(names.count() - 1)->click();
 }
 
@@ -99,11 +110,11 @@ void MainWindow::buttonClicked()
     QAbstractButton *b = (QAbstractButton *)sender();
     int count = btns.count();
     int index = btns.indexOf(b);
-    // ui->stackedWidget->setCurrentIndex(index);
+    ui->stackedWidget->setCurrentIndex(index);
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++)
+    {
         QAbstractButton *btn = btns.at(i);
         btn->setChecked(btn == b);
     }
-
 }

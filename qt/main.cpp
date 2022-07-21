@@ -10,8 +10,8 @@
 
 int main(int argc, char *argv[])
 {
-    qcm_elog_init();
-    qcm_init();
+    // qcm_elog_init();
+    // qcm_init();
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QApplication::setAttribute(Qt::AA_Use96Dpi);
 #endif
