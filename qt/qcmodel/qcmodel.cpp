@@ -24,33 +24,33 @@ public:
         pen.setColor(Qt::black);
         unsigned char _x, _y;
         _x = 0;
-        _y = idx * QCM::io_grap;
+        _y = idx * QCM::IOGrap;
         if (type == QCM::AI)
         {
-            m_idx->setPos(_x + QCM::io_len - m_idxWidth, _y - m_idxHeight);
-            m_name->setPos(_x + QCM::io_len, _y - m_nameHeight / 2);
+            m_idx->setPos(_x + QCM::IOLen - m_idxWidth, _y - m_idxHeight);
+            m_name->setPos(_x + QCM::IOLen, _y - m_nameHeight / 2);
         }
         else if (type == QCM::AO)
         {
-            _x = width + QCM::io_len;
+            _x = width + QCM::IOLen;
             m_idx->setPos(_x, _y - m_idxHeight);
             m_name->setPos(_x - m_nameWidth, _y - m_nameHeight / 2);
         }
         else if (type == QCM::DI)
         {
-            m_idx->setPos(_x + QCM::io_len - m_idxWidth, _y - m_idxHeight);
-            m_name->setPos(_x + QCM::io_len, _y - m_nameHeight / 2);
+            m_idx->setPos(_x + QCM::IOLen - m_idxWidth, _y - m_idxHeight);
+            m_name->setPos(_x + QCM::IOLen, _y - m_nameHeight / 2);
             pen.setStyle(Qt::DashDotLine);
         }
         else if (type == QCM::DO)
         {
-            _x = width + QCM::io_len;
+            _x = width + QCM::IOLen;
             m_idx->setPos(_x, _y - m_idxHeight);
             m_name->setPos(_x - m_nameWidth, _y - m_nameHeight / 2);
             pen.setStyle(Qt::DashDotLine);
         }
         setPen(pen);
-        setLine(_x, _y, _x + QCM::io_len, _y);
+        setLine(_x, _y, _x + QCM::IOLen, _y);
     }
     ~QIO() {}
 
@@ -78,12 +78,12 @@ QCModel::QCModel(QStringList AI, QStringList AO, QStringList DI, QStringList DO,
     unsigned int _o = m_numAO + m_numDO;
 
     m_body = new QGraphicsRectItem(parent);
-    m_body->setRect(QCM::io_len, 0, m_bodyWidth, ((_i > _o ? _i : _o) + 1) * QCM::io_grap);
+    m_body->setRect(QCM::IOLen, 0, m_bodyWidth, ((_i > _o ? _i : _o) + 1) * QCM::IOGrap);
     m_body->setFlag(QGraphicsItem::ItemIsMovable);
 
     m_name = new QGraphicsTextItem(m_body);
     m_name->setPlainText(name);
-    m_name->setPos(QCM::io_len, ((_i > _o ? _i : _o) + 1) * QCM::io_grap);
+    m_name->setPos(QCM::IOLen, ((_i > _o ? _i : _o) + 1) * QCM::IOGrap);
 
     for (unsigned int i = 0; i < _i; i++)
     {

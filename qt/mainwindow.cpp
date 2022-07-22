@@ -3,6 +3,7 @@
 
 #include <iconhelper.h>
 #include <frmrealtimedata.h>
+#include <QMetaEnum>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent), ui(new Ui::MainWindow)
@@ -31,8 +32,22 @@ void MainWindow::showEvent(QShowEvent *)
 
 void MainWindow::initWidgets()
 {
-    QGraphicsScene *scene = new QGraphicsScene();
-    QGraphicsView *view = new QGraphicsView(scene);
+    QCM_Scene *_scene = new QCM_Scene();
+    _scene->setParperSize(QCM::A3Paper);
+    m_view = new QCM_View(_scene);
+    m_posLabel = new QLabel(m_view);
+    m_posLabel->setGeometry(0, 0, 100, 20);
+
+    m_select = new QComboBox(m_view);
+    QStringList selectStr;
+    selectStr << "A2"
+              << "A3"
+              << "A4";
+    m_select->addItems(selectStr);
+    m_select->setGeometry(120, 0, 50, 20);
+    connect(m_select, SIGNAL(currentIndexChanged(int)), this, SLOT(paperSizeChanged(int)));
+
+    m_posLabel->setText("x:- y:-");
     QStringList pid_ai, pid_ao, pid_di, pid_do;
     pid_ai << "SP"
            << "PV"
@@ -40,10 +55,11 @@ void MainWindow::initWidgets()
     pid_ao << "AO";
     pid_di << "TR";
     QCModel *pid = new QCModel(pid_ai, pid_ao, pid_di, pid_do, "PID");
-    scene->addItem(pid->body());
-    view->resize(ui->stackedWidget->width(), ui->stackedWidget->height());
+    m_view->scene()->addItem(pid->body());
+    connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
+
     ui->stackedWidget->addWidget(new frmRealtimeData);
-    ui->stackedWidget->addWidget(view);
+    ui->stackedWidget->addWidget(m_view);
 }
 
 void MainWindow::initForm()
@@ -117,4 +133,15 @@ void MainWindow::buttonClicked()
         QAbstractButton *btn = btns.at(i);
         btn->setChecked(btn == b);
     }
+}
+
+void MainWindow::viewMouseMoved(QPointF pos)
+{
+    m_posLabel->setText(QString("x:%1 y:%2").arg((int)pos.x()).arg((int)pos.y()));
+}
+
+void MainWindow::paperSizeChanged(int index)
+{
+    QCM_Scene *scene = (QCM_Scene *)(m_view->scene());
+    scene->setParperSize(QCM::DefaultPapers[index][0]);
 }
