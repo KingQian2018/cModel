@@ -10,8 +10,7 @@ QCM_Node::~QCM_Node()
 
 void QCM_Node::init()
 {
-    setRect(QRect(3, 3, 3, 3));
-    setPos(m_x, m_y);
+    setRect(QRect(0, 0, 3, 3));
     setFlags(QGraphicsItem::ItemIsMovable);
 }
 
@@ -26,7 +25,9 @@ void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    painter->setPen(QPen(Qt::red));
+    QPen pen(Qt::red);
+    pen.setWidth(3);
+    painter->setPen(pen);
     painter->drawEllipse(0, 0, 3, 3);
 }
 

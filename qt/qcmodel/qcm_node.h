@@ -16,15 +16,8 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
 
-    uint x() const { return m_x; }
-    uint y() const { return m_y; }
-
-    void setX(uint x) { m_x = x; }
-    void setY(uint y) { m_y = y; }
-
 private:
     QRectF m_rect;
-    uint m_x, m_y;
 
     void setRect(const QRectF &rect);
     void init();

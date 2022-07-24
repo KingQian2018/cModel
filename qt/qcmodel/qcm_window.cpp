@@ -3,7 +3,7 @@
 QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
 {
     QCM_Scene *_scene = new QCM_Scene();
-    _scene->setParperSize(QCM::A2Paper);
+    _scene->setParperSize(QCM::A4Paper);
     m_view = new QCM_View(_scene);
     m_poslabel = new QLabel(m_view);
     m_poslabel->setGeometry(0, 0, 100, 20);
@@ -18,6 +18,7 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
               << "A4";
     m_select->addItems(selectStr);
     m_select->setGeometry(100, 0, 50, 20);
+    m_select->setCurrentIndex(2);
     connect(m_select, SIGNAL(currentIndexChanged(int)), this, SLOT(paperSizeChanged(int)));
 
     {
@@ -28,7 +29,7 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
         connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
 
         m_nodeLine = new QCM_NodeLine();
-        m_view->scene()->addItem(m_nodeLine);
+        m_view->scene()->addItem(m_nodeLine->nodeOut());
     }
 
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
