@@ -9,6 +9,7 @@
 #include "qcmodel.h"
 #include "qcm_view.h"
 #include "qcm_scene.h"
+#include "qcm_nodeline.h"
 
 #include "qcm_pid.h"
 
@@ -23,9 +24,14 @@ private:
     QCM_View *m_view;
     QLabel *m_poslabel;
     QComboBox *m_select;
+    QList<QAbstractButton *> m_btns;
+    QVBoxLayout *m_vboxlayout;
+    QCM_NodeLine *m_nodeLine;
+
 private slots:
     void viewMouseMoved(QPointF pos);
     void paperSizeChanged(int index);
+    void btnClicked();
 };
 
 #endif // QCM_WINDOW_H

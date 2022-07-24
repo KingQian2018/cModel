@@ -1,8 +1,5 @@
 #include "qcm_scene.h"
 
-#include <QtGui>
-#include <QGraphicsView>
-
 QCM_Scene::QCM_Scene(QObject *parent) : QGraphicsScene(parent)
 {
     setSceneRect(-100, -100, m_parperSize.width + 100, m_parperSize.height + 100);
@@ -61,7 +58,7 @@ void QCM_Scene::setParperSize(QCM::PaperSize_s size)
 void QCM_Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     auto items = selectedItems();
-    if (items.count() != 0)
+    if (items.count() != 0 && items.at(0)->data(QCM::ITEM_CLASS) == QCM::MODEL)
     {
         m_menu.exec(event->screenPos());
     }

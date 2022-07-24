@@ -8,6 +8,8 @@ add_library(lib_qcmodel
     qcm.h
     qcm_window.cpp 
     qcm_window.h
+    qcm_io.cpp 
+    qcm_io.h
     qcmodel.cpp 
     qcmodel.h
     qcm_view.cpp 
@@ -16,6 +18,8 @@ add_library(lib_qcmodel
     qcm_scene.h
     qcm_nodeline.cpp 
     qcm_nodeline.h
+    qcm_node.cpp 
+    qcm_node.h
     ${qcmodel}
     )
 

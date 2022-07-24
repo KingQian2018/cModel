@@ -4,8 +4,6 @@
 #include "qcm.h"
 #include "qcmodel.h"
 
-#include <QMenu>
-#include <QGraphicsSceneContextMenuEvent>
 namespace QCM
 {
     class QCM_Scene;
