@@ -9,8 +9,7 @@ void QCM_View::wheelEvent(QWheelEvent *event)
     int wheelValue = event->angleDelta().y();
     double _ratio = (double)wheelValue / (double)1200 + 1;
     scale(_ratio, _ratio);
-    ratio += _ratio - 1;
-    qDebug() << QString("ratio: %1").arg(ratio);
+    qDebug() << QString("transform.m11: %1").arg(transform().m11());
 }
 
 void QCM_View::mousePressEvent(QMouseEvent *event)
@@ -23,12 +22,6 @@ void QCM_View::mousePressEvent(QMouseEvent *event)
     }
     if (event->button() == Qt::RightButton)
     {
-        // 记录鼠标按下时的中心点坐标
-        // centerAnchor = mapToScene(event->pos()) - event->pos() + QPointF(width() / 2, height() / 2);
-        centerAnchor = event->pos();
-        qDebug() << QString("centerAnchor %1 %2").arg(centerAnchor.x()).arg(centerAnchor.y());
-        // 记录当前鼠标在view中的位置，用来在mouseMove事件中计算偏移
-        // 此处不将view坐标转换成scene坐标的原因是优化性能，在move的过程中会产生抖动
         posAnchor = event->pos();
         isMousePressed = true;
         setCursor(Qt::ClosedHandCursor);
@@ -38,11 +31,22 @@ void QCM_View::mousePressEvent(QMouseEvent *event)
 void QCM_View::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    QPointF offsetPos = event->pos() - posAnchor;
     if (isMousePressed)
     {
-        setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-        centerOn(centerAnchor - offsetPos);
+        //获取每次鼠标在场景坐标系下的平移量
+        QPointF mouseDelta = mapToScene(event->pos()) - mapToScene(posAnchor);
+        //调用平移方法
+        //如果是在缩放之后，调用的平移方法，那么平移量先要乘上缩放比，transform是view的变换矩阵，m11可以用为缩放比
+        mouseDelta *= this->transform().m11();
+
+        //修改锚点，调用缩放方法
+        this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+        this->centerOn(this->mapToScene(QPoint(this->viewport()->rect().width() / 2 - mouseDelta.x(),
+                                               this->viewport()->rect().height() / 2 - mouseDelta.y())));
+        this->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+
+        // posAnchor是MyGraphicsView的私有成员变量，用以记录每次的事件结束时候的鼠标位置
+        posAnchor = event->pos();
     }
     emit posChanged(mapToScene(event->pos()));
 }

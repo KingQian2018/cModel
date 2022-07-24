@@ -22,8 +22,6 @@ private:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     bool isMousePressed = false;
-    double ratio = 1;
-    QPointF centerAnchor;
     QPoint posAnchor;
 
 signals:
