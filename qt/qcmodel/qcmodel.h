@@ -1,54 +1,50 @@
 #ifndef QCM_MODEL_H
 #define QCM_MODEL_H
 
-#include <QGraphicsItem>
+#include "qcm.h"
 
-namespace QCM
+class QIO : public QGraphicsLineItem
 {
-    static const unsigned int IOLen = 30, IOGrap = 30;
-
-    enum Paper_TYPE
-    {
-        A2,
-        A3,
-        A4,
-    };
-
-    typedef struct _paperSize
-    {
-        Paper_TYPE type;
-        unsigned int width, height;
-    } PaperSize_s;
-    static const PaperSize_s A2Paper = {.type = A2, .width = 5940, .height = 4200};
-    static const PaperSize_s A3Paper = {.type = A3, .width = 4200, .height = 2970};
-    static const PaperSize_s A4Paper = {.type = A4, .width = 2970, .height = 2100};
-    static const PaperSize_s *DefaultPapers[] = {&A2Paper, &A3Paper, &A4Paper};
-
-    class QCModel;
-    enum IO_TYPE
-    {
-        AI,
-        AO,
-        DI,
-        DO
-    };
-}
-
-class QCModel
-{
-    class QIO;
-
 public:
-    QCModel(QStringList AI, QStringList AO, QStringList DI, QStringList DO, QString name = "model", unsigned int width = 100, QGraphicsItem *parent = nullptr);
-    ~QCModel();
-    QGraphicsRectItem *body() const { return m_body; }
+    QIO(QCM::IO_TYPE type, QString name, unsigned char idx, QGraphicsItem *parent = nullptr, unsigned int width = 0);
+    ~QIO() {}
+
+    unsigned int idxWidth() const { return m_idxWidth; }
+    unsigned int idxHeight() const { return m_idxHeight; }
+    unsigned int nameWidth() const { return m_nameWidth; }
+    unsigned int nameHeight() const { return m_nameHeight; }
 
 private:
-    unsigned char m_numAI, m_numAO, m_numDI, m_numDO;
+    QGraphicsTextItem *m_idx, *m_name;
+    unsigned int m_idxWidth;
+    unsigned int m_idxHeight;
+    unsigned int m_nameWidth;
+    unsigned int m_nameHeight;
+};
+
+class QCModel : public QGraphicsRectItem
+{
+
+public:
+    QCModel(const QCModel &);
+    QCModel(QStringList AI, QStringList AO, QStringList DI, QStringList DO, uint ID,
+            QString name = "model", unsigned int width = 100, QGraphicsItem *parent = nullptr);
+    ~QCModel();
+
+    uint ID() const { return m_ID; }
+    virtual QCModel *copy();
+
+protected:
+    uint m_ID;
+
+private:
+    QStringList m_AI, m_AO, m_DI, m_DO;
     unsigned int m_bodyWidth;
     QList<QIO *> m_ios;
-    QGraphicsRectItem *m_body;
-    QGraphicsTextItem *m_name;
+    QString m_name;
+    QGraphicsTextItem *m_nameText;
+
+    void initModel();
 };
 
 #endif // QCM_MODEL_H
