@@ -26,6 +26,13 @@ void QCM_View::mousePressEvent(QMouseEvent *event)
         isMousePressed = true;
         setCursor(Qt::ClosedHandCursor);
     }
+    else if (event->button() == Qt::LeftButton)
+    {
+        if (m_isSetLink)
+        {
+            
+        }
+    }
 }
 
 void QCM_View::mouseMoveEvent(QMouseEvent *event)

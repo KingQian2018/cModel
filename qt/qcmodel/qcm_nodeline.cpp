@@ -10,11 +10,27 @@ QCM_NodeLine::QCM_NodeLine(qreal x1, qreal y1, qreal x2, qreal y2, QGraphicsItem
 {
     init();
 }
+
 QCM_NodeLine::QCM_NodeLine(qreal x1, qreal y1, QGraphicsItem *parent)
     : QCM_NodeLine(x1, y1, x1, y1, parent)
 
 {
-    init();
+}
+
+QCM_NodeLine::QCM_NodeLine(QCM_Node *_node1, QCM_Node *_node2, QGraphicsItem *parent)
+    : QGraphicsLineItem(parent)
+{
+    setLine(_node1->pos().x(), _node1->pos().y(),
+            _node2->pos().x(), _node2->pos().y());
+    m_node1 = _node1;
+    m_node1->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+    m_node1->setAcceptHoverEvents(true);
+    m_node2 = _node2;
+    m_node2->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+    m_node2->setAcceptHoverEvents(true);
+    setFlags(QGraphicsItem::ItemIsMovable |
+             QGraphicsItem::ItemSendsGeometryChanges);
+    setPen(QPen(Qt::black, 6, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
 
 void QCM_NodeLine::init()

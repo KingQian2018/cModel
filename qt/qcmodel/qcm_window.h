@@ -11,6 +11,7 @@
 #include "qcm_scene.h"
 #include "qcm_nodeline.h"
 #include "qcm_node.h"
+#include "qcm_linknodes.h"
 
 #include "qcm_pid.h"
 
@@ -29,6 +30,8 @@ private:
     QVBoxLayout *m_vboxlayout;
     QCM_NodeLine *m_nodeLine;
     QCM_Node *m_node;
+
+    bool isSetLink;
 
 private slots:
     void viewMouseMoved(QPointF pos);

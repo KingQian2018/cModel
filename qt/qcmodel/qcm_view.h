@@ -15,6 +15,8 @@ public:
     QCM_View(QWidget *parent = nullptr) : QGraphicsView(parent) {}
     QCM_View(QGraphicsScene *scene, QWidget *parent = nullptr) : QGraphicsView(scene, parent) {}
     ~QCM_View() {}
+    bool isSetLink() const { return m_isSetLink; }
+    void setLink(bool v) { m_isSetLink = v; }
 
 private:
     void wheelEvent(QWheelEvent *event);
@@ -22,6 +24,7 @@ private:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     bool isMousePressed = false;
+    bool m_isSetLink = false;
     QPoint posAnchor;
 
 signals:

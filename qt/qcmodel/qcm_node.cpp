@@ -3,6 +3,10 @@ QCM_Node::QCM_Node(QGraphicsItem *parent) : QGraphicsItem(parent)
 {
     init();
 }
+QCM_Node::QCM_Node(qreal x, qreal y, QGraphicsItem *parent) : QCM_Node(parent)
+{
+    setPos(x, y);
+}
 
 QCM_Node::~QCM_Node()
 {

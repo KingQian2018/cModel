@@ -13,6 +13,7 @@ class QCM_NodeLine : public QGraphicsLineItem
 {
 public:
     QCM_NodeLine(QGraphicsItem *parent = nullptr);
+    QCM_NodeLine(QCM_Node *_node1, QCM_Node *_node2, QGraphicsItem *parent = nullptr);
     QCM_NodeLine(qreal x1, qreal y1, QGraphicsItem *parent = nullptr);
     QCM_NodeLine(qreal x1, qreal y1, qreal x2, qreal y2, QGraphicsItem *parent = nullptr);
     ~QCM_NodeLine() {}

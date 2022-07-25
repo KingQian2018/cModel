@@ -78,9 +78,8 @@ void QCM_Window::btnClicked()
     }
     else if (b->text() == "Link")
     {
-        auto _node = new QCM_Node();
-        _node->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
-        _node->setAcceptHoverEvents(true);
-        m_view->scene()->addItem(_node);
+        setCursor(Qt::CrossCursor);
+        new QCM_LinkNodes(m_view->scene());
+        m_view->setLink(true);
     }
 }
