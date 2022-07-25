@@ -1,16 +1,16 @@
-#ifndef QCM_MODEL_H
-#define QCM_MODEL_H
+#ifndef QCMODEL_H
+#define QCMODEL_H
 
 #include "qcm.h"
 #include "qcm_io.h"
 
-class QCModel : public QGraphicsRectItem
+class QCModel : public QGraphicsItem
 {
 
 public:
     QCModel(const QCModel &);
     QCModel(QStringList AI, QStringList AO, QStringList DI, QStringList DO, uint ID,
-            QString name = "model", uint width = 100, QGraphicsItem *parent = nullptr);
+            QString name = "model", uint width = 90, QGraphicsItem *parent = nullptr);
     ~QCModel();
 
     uint ID() const { return m_ID; }
@@ -21,13 +21,16 @@ protected:
 
 private:
     QStringList m_AI, m_AO, m_DI, m_DO;
-    uint m_bodyWidth;
+    uint m_bodyWidth, m_bodyHeight;
     QList<QCM_IO *> m_ios;
     QString m_name;
     QGraphicsTextItem *m_nameText;
+    
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void initModel();
 };
 
-#endif // QCM_MODEL_H
+#endif // QCMODEL_H

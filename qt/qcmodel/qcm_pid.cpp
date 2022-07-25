@@ -4,7 +4,7 @@ QCM_PID::QCM_PID(uint ID, QGraphicsItem *parent) : QCModel(QStringList({"SP", "P
                                                            QStringList({"AO"}),
                                                            QStringList({"TR"}),
                                                            QStringList(),
-                                                           ID, "PID", 100, parent)
+                                                           ID, "PID", 90, parent)
 {
 }
 

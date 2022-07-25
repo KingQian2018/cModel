@@ -18,26 +18,31 @@ QCM_IO::QCM_IO(QCM::IO_TYPE type, QString name, uint idx, QGraphicsItem *parent,
 
     QPen pen;
     pen.setColor(Qt::black);
-    pen.setWidth(3);
+    pen.setWidth(2);
     uint _x, _y;
     _x = 0;
     _y = idx * QCM::IOGrap;
+
+    m_node = new QCM_Node(this);
     if (type == QCM::AI)
     {
         m_idx->setPos(_x + QCM::IOLen - m_idxWidth, _y - m_idxHeight);
         m_name->setPos(_x + QCM::IOLen, _y - m_nameHeight / 2);
+        m_node->setPos(_x, _y);
     }
     else if (type == QCM::AO)
     {
         _x = width + QCM::IOLen;
         m_idx->setPos(_x, _y - m_idxHeight);
         m_name->setPos(_x - m_nameWidth, _y - m_nameHeight / 2);
+        m_node->setPos(_x + QCM::IOLen, _y);
     }
     else if (type == QCM::DI)
     {
         m_idx->setPos(_x + QCM::IOLen - m_idxWidth, _y - m_idxHeight);
         m_name->setPos(_x + QCM::IOLen, _y - m_nameHeight / 2);
         pen.setStyle(Qt::DashDotLine);
+        m_node->setPos(_x, _y);
     }
     else if (type == QCM::DO)
     {
@@ -45,6 +50,7 @@ QCM_IO::QCM_IO(QCM::IO_TYPE type, QString name, uint idx, QGraphicsItem *parent,
         m_idx->setPos(_x, _y - m_idxHeight);
         m_name->setPos(_x - m_nameWidth, _y - m_nameHeight / 2);
         pen.setStyle(Qt::DashDotLine);
+        m_node->setPos(_x + QCM::IOLen, _y);
     }
     setPen(pen);
     setLine(_x, _y, _x + QCM::IOLen, _y);

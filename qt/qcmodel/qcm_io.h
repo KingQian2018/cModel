@@ -2,7 +2,7 @@
 #define QCM_IO_H
 
 #include "qcm.h"
-#include "qcm_nodeline.h"
+#include "qcm_node.h"
 
 class QCM_IO : public QGraphicsLineItem
 {
@@ -21,6 +21,7 @@ private:
     uint m_idxHeight;
     uint m_nameWidth;
     uint m_nameHeight;
+    QCM_Node *m_node;
 };
 
 #endif // QCM_IO_H

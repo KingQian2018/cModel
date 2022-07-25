@@ -11,9 +11,7 @@ QCM_Node::~QCM_Node()
 void QCM_Node::init()
 {
     setRect(QRect(0, 0, 3, 3));
-    setFlags(QGraphicsItem::ItemIsMovable |
-             QGraphicsItem::ItemSendsGeometryChanges);
-    setAcceptHoverEvents(true);
+    setData(QCM::ItemKey_TYPE::ITEM_CLASS, QCM::NODE);
 }
 
 QRectF QCM_Node::boundingRect() const
@@ -28,6 +26,16 @@ void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option);
     Q_UNUSED(widget);
     QPen pen(Qt::red);
+    if (!scene()->collidingItems(this).isEmpty())
+    {
+        foreach (auto _item, scene()->collidingItems(this))
+        {
+            if (_item->data(QCM::ItemKey_TYPE::ITEM_CLASS) == QCM::NODE)
+            {
+                pen.setColor(Qt::blue);
+            }
+        }
+    }
     pen.setWidth(4);
     painter->setPen(pen);
     painter->drawPoint(0, 0);

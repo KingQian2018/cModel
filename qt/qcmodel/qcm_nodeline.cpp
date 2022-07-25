@@ -9,8 +9,14 @@ void QCM_NodeLine::init()
 {
     m_nodeOut = new QCM_Node(this);
     m_nodeOut->setPos(0, 0);
+    m_nodeOut->setFlags(QGraphicsItem::ItemIsMovable |
+                        QGraphicsItem::ItemSendsGeometryChanges);
+    m_nodeOut->setAcceptHoverEvents(true);
     QCM_Node *nodeIn = new QCM_Node(this);
-    nodeIn->setPos(100, 100);
+    nodeIn->setPos(100, 0);
+    nodeIn->setFlags(QGraphicsItem::ItemIsMovable |
+                     QGraphicsItem::ItemSendsGeometryChanges);
+    nodeIn->setAcceptHoverEvents(true);
     addNodeIn(nodeIn);
     this->setZValue(m_nodeOut->zValue() - 1); //目的：让箭头后置
     setFlags(QGraphicsItem::ItemIsMovable |

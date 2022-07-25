@@ -26,7 +26,7 @@ public:
 
 private:
     QCM::PaperSize_s m_parperSize = QCM::A4Paper;
-    unsigned int m_grid = 100;
+    unsigned int m_grid = 30;
     QMenu m_menu;
 
     void drawBackground(QPainter *painter, const QRectF &rect);

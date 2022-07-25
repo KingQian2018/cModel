@@ -7,6 +7,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QGraphicsLineItem>
+#include <QStyleOptionGraphicsItem>
 #include <QtGui>
 #include <QtGui/qpen.h>
 #include <QtGui/qpainter.h>
@@ -44,6 +45,7 @@ namespace QCM
     enum Item_TYPE
     {
         MODEL,
+        NODE,
         NODE_LINE,
     };
 
