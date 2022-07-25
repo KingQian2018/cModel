@@ -13,6 +13,8 @@ class QCM_Node : public QGraphicsItem
 public:
     QCM_Node(QGraphicsItem *parent = nullptr);
     QCM_Node(qreal x, qreal y, QGraphicsItem *parent = nullptr);
+    QCM_Node(QPointF pos, QGraphicsItem *parent = nullptr);
+
     ~QCM_Node();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);

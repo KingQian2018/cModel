@@ -47,12 +47,30 @@ namespace QCM
         MODEL,
         NODE,
         NODE_LINE,
+        PRE_NODE_LINE,
     };
 
     enum ItemKey_TYPE
     {
         ITEM_CLASS = 0,
     };
+
+    static uint Grid = 30;
+    static void SetGrid(uint grid)
+    {
+        Grid = grid;
+    }
+    static QPointF AlignToGrid(QPointF newPos)
+    {
+        int h = qRound(newPos.x() / Grid);
+        int pos = h * Grid;
+        newPos.setX(pos);
+
+        h = qRound(newPos.y() / Grid);
+        pos = h * Grid;
+        newPos.setY(pos);
+        return newPos;
+    }
 }
 
 #endif // QCM_H

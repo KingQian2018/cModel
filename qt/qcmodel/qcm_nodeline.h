@@ -48,4 +48,14 @@ private:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 };
 
+class QCM_PreNodeLine : public QCM_NodeLine
+{
+public:
+    QCM_PreNodeLine(QGraphicsItem *parent = nullptr) : QCM_NodeLine(parent) { setData(QCM::ITEM_CLASS, QCM::PRE_NODE_LINE); }
+    QCM_PreNodeLine(QCM_Node *_node1, QCM_Node *_node2, QGraphicsItem *parent = nullptr) : QCM_NodeLine(_node1, _node2, parent) { setData(QCM::ITEM_CLASS, QCM::PRE_NODE_LINE); }
+    ~QCM_PreNodeLine() {}
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+};
+
 #endif // QCM_NODELINE_H

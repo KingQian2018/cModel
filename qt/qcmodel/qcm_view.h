@@ -29,6 +29,8 @@ private:
 
 signals:
     void posChanged(QPointF pos);
+    void setLinked(QPointF);
+    void movePreLinked(QPointF);
 };
 
 #endif // QCM_VIEW_H

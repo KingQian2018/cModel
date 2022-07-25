@@ -8,6 +8,11 @@ QCM_Node::QCM_Node(qreal x, qreal y, QGraphicsItem *parent) : QCM_Node(parent)
     setPos(x, y);
 }
 
+QCM_Node::QCM_Node(QPointF pos, QGraphicsItem *parent)
+    : QCM_Node(pos.x(), pos.y(), parent)
+{
+}
+
 QCM_Node::~QCM_Node()
 {
 }
@@ -58,18 +63,9 @@ void QCM_Node::setRect(const QRectF &rect)
 #include "qcm_scene.h"
 QVariant QCM_Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemPositionChange && scene())
+    if (change == ItemPositionChange)
     {
-        auto _scene = (QCM_Scene *)scene();
-        auto newPos = value.toPointF();
-        int h = qRound(newPos.x() / _scene->grid());
-        int pos = h * _scene->grid();
-        newPos.setX(pos);
-
-        h = qRound(newPos.y() / _scene->grid());
-        pos = h * _scene->grid();
-        newPos.setY(pos);
-        return newPos;
+        return QCM::AlignToGrid(value.toPointF());
     }
     return QGraphicsItem::itemChange(change, value);
 }

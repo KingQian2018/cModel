@@ -2,9 +2,9 @@
 
 QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
 {
-    QCM_Scene *_scene = new QCM_Scene();
-    _scene->setParperSize(QCM::A4Paper);
-    m_view = new QCM_View(_scene);
+    m_scene = new QCM_Scene();
+    m_scene->setParperSize(QCM::A4Paper);
+    m_view = new QCM_View(m_scene);
     m_poslabel = new QLabel(m_view);
     m_poslabel->setGeometry(0, 0, 100, 20);
 
@@ -42,7 +42,7 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
         connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
 
         m_nodeLine = new QCM_NodeLine();
-        m_view->scene()->addItem(m_nodeLine);
+        m_scene->addItem(m_nodeLine);
     }
 
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
@@ -59,14 +59,12 @@ void QCM_Window::viewMouseMoved(QPointF pos)
 
 void QCM_Window::paperSizeChanged(int index)
 {
-    QCM_Scene *scene = (QCM_Scene *)(m_view->scene());
-    scene->setParperSize(QCM::DefaultPapers[index][0]);
+    m_scene->setParperSize(QCM::DefaultPapers[index][0]);
 }
 
 void QCM_Window::gridChanged(int index)
 {
-    QCM_Scene *scene = (QCM_Scene *)(m_view->scene());
-    scene->setGrid((index + 1) * 10);
+    QCM::SetGrid((index + 1) * 10);
 }
 
 void QCM_Window::btnClicked()
@@ -74,12 +72,15 @@ void QCM_Window::btnClicked()
     QAbstractButton *b = (QAbstractButton *)sender();
     if (b->text() == "PID")
     {
-        m_view->scene()->addItem(new QCM_PID(1));
+        m_scene->addItem(new QCM_PID(1));
     }
     else if (b->text() == "Link")
     {
-        setCursor(Qt::CrossCursor);
-        new QCM_LinkNodes(m_view->scene());
+        m_scene->addLinks(new QCM_LinkNodes(m_scene));
+        connect(m_view, SIGNAL(setLinked(QPointF)),
+                m_scene->links().last(), SLOT(addNode(QPointF)));
+        connect(m_view, SIGNAL(movePreLinked(QPointF)),
+                m_scene->links().last(), SLOT(movePreNode(QPointF)));
         m_view->setLink(true);
     }
 }

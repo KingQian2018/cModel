@@ -24,6 +24,7 @@ public:
 
 private:
     QCM_View *m_view;
+    QCM_Scene *m_scene;
     QLabel *m_poslabel;
     QComboBox *m_select;
     QList<QAbstractButton *> m_btns;

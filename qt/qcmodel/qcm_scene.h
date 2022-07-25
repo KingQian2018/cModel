@@ -3,6 +3,7 @@
 
 #include "qcm.h"
 #include "qcmodel.h"
+#include "qcm_linknodes.h"
 
 namespace QCM
 {
@@ -17,17 +18,14 @@ public:
     ~QCM_Scene() {}
     void setParperSize(QCM::PaperSize_s size);
     QCM::PaperSize_s parperSize(void) const { return m_parperSize; }
-    void setGrid(uint grid)
-    {
-        m_grid = grid;
-        update();
-    }
-    uint grid() const { return m_grid; }
+
+    void addLinks(QCM_LinkNodes* node) { m_links.append(node); }
+    QList<QCM_LinkNodes *> links() const { return m_links; }
 
 private:
     QCM::PaperSize_s m_parperSize = QCM::A4Paper;
-    unsigned int m_grid = 30;
     QMenu m_menu;
+    QList<QCM_LinkNodes *> m_links;
 
     void drawBackground(QPainter *painter, const QRectF &rect);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);

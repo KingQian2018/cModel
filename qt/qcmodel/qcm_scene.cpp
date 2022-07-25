@@ -36,9 +36,9 @@ void QCM_Scene::drawBackground(QPainter *painter, const QRectF &rect)
     painter->setPen(pen);
 
     //绘制网格点
-    for (int i = top + m_grid; i <= bottom; i += m_grid)
+    for (int i = top + QCM::Grid; i <= bottom; i += QCM::Grid)
     {
-        for (int j = left + m_grid; j < right; j += m_grid)
+        for (int j = left + QCM::Grid; j < right; j += QCM::Grid)
         {
             painter->drawPoint(j, i);
         }

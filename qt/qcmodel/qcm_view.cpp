@@ -24,13 +24,13 @@ void QCM_View::mousePressEvent(QMouseEvent *event)
     {
         posAnchor = event->pos();
         isMousePressed = true;
-        setCursor(Qt::ClosedHandCursor);
     }
     else if (event->button() == Qt::LeftButton)
     {
         if (m_isSetLink)
         {
-            
+            auto _point = mapToScene(event->pos());
+            emit setLinked(_point);
         }
     }
 }
@@ -54,6 +54,25 @@ void QCM_View::mouseMoveEvent(QMouseEvent *event)
 
         // posAnchor是MyGraphicsView的私有成员变量，用以记录每次的事件结束时候的鼠标位置
         posAnchor = event->pos();
+        if (cursor() != Qt::ClosedHandCursor)
+        {
+            setCursor(Qt::ClosedHandCursor);
+        }
+    }
+    else if (m_isSetLink)
+    {
+        if (cursor() != Qt::CrossCursor)
+        {
+            setCursor(Qt::CrossCursor);
+        }
+        emit movePreLinked(mapToScene(event->pos()));
+    }
+    else
+    {
+        if (cursor() != Qt::ArrowCursor)
+        {
+            setCursor(Qt::ArrowCursor);
+        }
     }
     emit posChanged(mapToScene(event->pos()));
 }
@@ -63,7 +82,22 @@ void QCM_View::mouseReleaseEvent(QMouseEvent *event)
     QGraphicsView::mouseReleaseEvent(event);
     if (event->button() == Qt::RightButton)
     {
+        if (m_isSetLink)
+        {
+            m_isSetLink = false;
+            foreach (auto i, scene()->items())
+            {
+                if (i->data(QCM::ITEM_CLASS) == QCM::PRE_NODE_LINE)
+                {
+                    scene()->removeItem(i);
+                    break;
+                }
+            }
+            foreach (auto i, ((QCM_Scene *)scene())->links())
+            {
+                i->setIsEdited(false);
+            }
+        }
         isMousePressed = false;
-        setCursor(Qt::ArrowCursor);
     }
 }
