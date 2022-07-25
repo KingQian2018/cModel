@@ -23,8 +23,8 @@ void QCModel::initModel()
 {
     setData(QCM::ITEM_CLASS, QCM::MODEL);
     QPen pen;
-    pen.setColor(Qt::black);
-    pen.setWidth(3);
+    pen.setColor(Qt::blue);
+    pen.setWidth(2);
     setPen(pen);
 
     uint _i = m_AI.count() + m_DI.count();
@@ -32,7 +32,8 @@ void QCModel::initModel()
 
     setRect(QCM::IOLen, 0, m_bodyWidth, ((_i > _o ? _i : _o) + 1) * QCM::IOGrap);
     setFlags(QGraphicsItem::ItemIsMovable |
-             QGraphicsItem::ItemIsSelectable);
+             QGraphicsItem::ItemIsSelectable |
+             QGraphicsItem::ItemSendsGeometryChanges);
 
     m_nameText = new QGraphicsTextItem(this);
     m_nameText->setPlainText(m_name + QString::number(m_ID));
@@ -66,4 +67,26 @@ void QCModel::initModel()
 QCModel *QCModel::copy()
 {
     return (new QCModel(*this));
+}
+
+#include "qcm_scene.h"
+QVariant QCModel::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == ItemPositionChange && scene())
+    {
+        auto _scene = (QCM_Scene *)scene();
+        auto newPos = value.toPoint();
+        int h = newPos.x() / _scene->grid();
+        int l = newPos.x() % _scene->grid();
+        int pos = (l < (_scene->grid() / 2) ? h : h + 1) * _scene->grid();
+        newPos.setX(pos);
+
+        h = newPos.y() / _scene->grid();
+        l = newPos.y() % _scene->grid();
+        pos = (l < (_scene->grid() / 2) ? h : h + 1) * _scene->grid();
+        newPos.setY(pos);
+
+        return newPos;
+    }
+    return QGraphicsRectItem::itemChange(change, value);
 }

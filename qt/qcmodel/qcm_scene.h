@@ -17,6 +17,12 @@ public:
     ~QCM_Scene() {}
     void setParperSize(QCM::PaperSize_s size);
     QCM::PaperSize_s parperSize(void) const { return m_parperSize; }
+    void setGrid(uint grid)
+    {
+        m_grid = grid;
+        update();
+    }
+    uint grid() const { return m_grid; }
 
 private:
     QCM::PaperSize_s m_parperSize = QCM::A4Paper;

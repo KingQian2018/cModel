@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <QGraphicsLineItem>
 #include <QtGui>
 #include <QtGui/qpen.h>
 #include <QtGui/qpainter.h>

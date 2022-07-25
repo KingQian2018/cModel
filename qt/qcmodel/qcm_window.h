@@ -33,6 +33,7 @@ private:
 private slots:
     void viewMouseMoved(QPointF pos);
     void paperSizeChanged(int index);
+    void gridChanged(int index);
     void btnClicked();
 };
 

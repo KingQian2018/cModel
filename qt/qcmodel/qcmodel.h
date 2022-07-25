@@ -25,6 +25,7 @@ private:
     QList<QCM_IO *> m_ios;
     QString m_name;
     QGraphicsTextItem *m_nameText;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
     void initModel();
 };

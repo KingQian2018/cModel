@@ -21,6 +21,9 @@ private:
 
     void setRect(const QRectF &rect);
     void init();
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) { setCursor(Qt::DragMoveCursor); }
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) { setCursor(Qt::ArrowCursor); }
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 };
 
 #endif // QCM_NODE_H

@@ -27,9 +27,20 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
         toolBtn->setGeometry(160, 0, 60, 20);
         m_btns.append(toolBtn);
         connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
-
+        auto node1 = new QCM_Node();
+        node1->setPos(0, 0);
+        auto *nodeIn = new QCM_Node();
+        nodeIn->setPos(100, 100);
         m_nodeLine = new QCM_NodeLine();
-        m_view->scene()->addItem(m_nodeLine->nodeOut());
+        m_view->scene()->addItem(m_nodeLine);
+    }
+
+    {
+        auto selectGrid = new QComboBox(m_view);
+        selectGrid->addItems(QStringList({"10", "20", "30", "40", "50", "60"}));
+        selectGrid->setGeometry(230, 0, 50, 20);
+        selectGrid->setCurrentIndex(2);
+        connect(selectGrid, SIGNAL(currentIndexChanged(int)), this, SLOT(gridChanged(int)));
     }
 
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
@@ -48,6 +59,12 @@ void QCM_Window::paperSizeChanged(int index)
 {
     QCM_Scene *scene = (QCM_Scene *)(m_view->scene());
     scene->setParperSize(QCM::DefaultPapers[index][0]);
+}
+
+void QCM_Window::gridChanged(int index)
+{
+    QCM_Scene *scene = (QCM_Scene *)(m_view->scene());
+    scene->setGrid((index + 1) * 10);
 }
 
 void QCM_Window::btnClicked()

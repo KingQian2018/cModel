@@ -21,7 +21,6 @@ private:
     uint m_idxHeight;
     uint m_nameWidth;
     uint m_nameHeight;
-    QCM_NodeLine m_nodeLine;
 };
 
 #endif // QCM_IO_H

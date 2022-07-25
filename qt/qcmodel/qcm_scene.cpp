@@ -32,19 +32,16 @@ void QCM_Scene::drawBackground(QPainter *painter, const QRectF &rect)
     painter->drawLine(right, top, right, bottom);
 
     pen.setColor(QColor(60, 60, 60));
-    pen.setWidth(0);
-    pen.setStyle(Qt::DashLine);
+    pen.setWidth(2);
     painter->setPen(pen);
-    //绘制横线
-    for (int i = top; i <= bottom; i += m_grid)
-    {
-        painter->drawLine(left, i, right, i);
-    }
 
-    //绘制竖线
-    for (int i = left; i <= right; i += m_grid)
+    //绘制网格点
+    for (int i = top + m_grid; i <= bottom; i += m_grid)
     {
-        painter->drawLine(i, top, i, bottom);
+        for (int j = left + m_grid; j < right; j += m_grid)
+        {
+            painter->drawPoint(j, i);
+        }
     }
 }
 
