@@ -22,25 +22,27 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
     connect(m_select, SIGNAL(currentIndexChanged(int)), this, SLOT(paperSizeChanged(int)));
 
     {
-        QToolButton *toolBtn = new QToolButton(m_view);
-        toolBtn->setText("PID");
-        toolBtn->setGeometry(160, 0, 60, 20);
-        m_btns.append(toolBtn);
-        connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
-        auto node1 = new QCM_Node();
-        node1->setPos(0, 0);
-        auto *nodeIn = new QCM_Node();
-        nodeIn->setPos(100, 100);
-        m_nodeLine = new QCM_NodeLine();
-        m_view->scene()->addItem(m_nodeLine);
+        auto selectGrid = new QComboBox(m_view);
+        selectGrid->addItems(QStringList({"10", "20", "30", "40", "50", "60"}));
+        selectGrid->setGeometry(160, 0, 50, 20);
+        selectGrid->setCurrentIndex(2);
+        connect(selectGrid, SIGNAL(currentIndexChanged(int)), this, SLOT(gridChanged(int)));
     }
 
     {
-        auto selectGrid = new QComboBox(m_view);
-        selectGrid->addItems(QStringList({"10", "20", "30", "40", "50", "60"}));
-        selectGrid->setGeometry(230, 0, 50, 20);
-        selectGrid->setCurrentIndex(2);
-        connect(selectGrid, SIGNAL(currentIndexChanged(int)), this, SLOT(gridChanged(int)));
+        QToolButton *toolBtn = new QToolButton(m_view);
+        toolBtn->setText("Link");
+        toolBtn->setGeometry(220, 0, 60, 20);
+        m_btns.append(toolBtn);
+        connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
+        toolBtn = new QToolButton(m_view);
+        toolBtn->setText("PID");
+        toolBtn->setGeometry(290, 0, 60, 20);
+        m_btns.append(toolBtn);
+        connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
+
+        m_nodeLine = new QCM_NodeLine();
+        m_view->scene()->addItem(m_nodeLine);
     }
 
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
@@ -69,5 +71,16 @@ void QCM_Window::gridChanged(int index)
 
 void QCM_Window::btnClicked()
 {
-    m_view->scene()->addItem(new QCM_PID(1));
+    QAbstractButton *b = (QAbstractButton *)sender();
+    if (b->text() == "PID")
+    {
+        m_view->scene()->addItem(new QCM_PID(1));
+    }
+    else if (b->text() == "Link")
+    {
+        auto _node = new QCM_Node();
+        _node->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+        _node->setAcceptHoverEvents(true);
+        m_view->scene()->addItem(_node);
+    }
 }

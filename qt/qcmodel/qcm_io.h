@@ -15,6 +15,12 @@ public:
     uint nameWidth() const { return m_nameWidth; }
     uint nameHeight() const { return m_nameHeight; }
 
+    void linkNode(QCM_Node *node)
+    {
+        delete m_node;
+        m_node = node;
+    }
+
 private:
     QGraphicsTextItem *m_idx, *m_name;
     uint m_idxWidth;

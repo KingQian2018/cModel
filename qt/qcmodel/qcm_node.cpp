@@ -57,17 +57,14 @@ QVariant QCM_Node::itemChange(GraphicsItemChange change, const QVariant &value)
     if (change == ItemPositionChange && scene())
     {
         auto _scene = (QCM_Scene *)scene();
-        auto newPos = value.toPoint();
-        int h = (newPos.x()) / _scene->grid();
-        int l = (newPos.x()) % _scene->grid();
-        int pos = (l < (_scene->grid() / 2) ? h : h + 1) * _scene->grid();
+        auto newPos = value.toPointF();
+        int h = qRound(newPos.x() / _scene->grid());
+        int pos = h * _scene->grid();
         newPos.setX(pos);
 
-        h = (newPos.y()) / _scene->grid();
-        l = (newPos.y()) % _scene->grid();
-        pos = (l < (_scene->grid() / 2) ? h : h + 1) * _scene->grid();
+        h = qRound(newPos.y() / _scene->grid());
+        pos = h * _scene->grid();
         newPos.setY(pos);
-
         return newPos;
     }
     return QGraphicsItem::itemChange(change, value);

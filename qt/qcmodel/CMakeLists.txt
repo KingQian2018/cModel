@@ -20,6 +20,8 @@ add_library(lib_qcmodel
     qcm_nodeline.h
     qcm_node.cpp 
     qcm_node.h
+    qcm_linknodes.cpp
+    qcm_linknodes.h
     ${qcmodel}
     )
 
