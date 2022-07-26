@@ -69,17 +69,23 @@ void QCM_Window::btnClicked()
     QAbstractButton *b = (QAbstractButton *)sender();
     if (b->text() == "PID")
     {
+        QCM_Node *node3 = new QCM_Node(QCM::AlignToGrid(30, 90));
+        for (auto l : m_scene->items())
+        {
+            if (l->type() == QGraphicsItem::UserType + QCM::LINE && l->isSelected())
+            {
+                ((QCM_Line *)l)->addNode(node3);
+            }
+        }
         m_scene->addItem(new QCM_PID(1));
     }
     else if (b->text() == "Link")
     {
         QCM_Node *node1 = new QCM_Node(QCM::AlignToGrid(100, 0));
         QCM_Node *node2 = new QCM_Node(QCM::AlignToGrid(30, 30));
-        QCM_Node *node3 = new QCM_Node(QCM::AlignToGrid(30, 90));
         m_scene->addItem(node1);
         m_scene->addItem(node2);
-        m_scene->addItem(node3);
-        m_scene->addItem(new QCM_Line(node1, node2));
-        m_scene->addItem(new QCM_PreLine(node2, node3));
+        auto _line = new QCM_Line(node1, node2);
+        m_scene->addItem(_line);
     }
 }

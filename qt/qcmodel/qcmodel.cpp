@@ -85,7 +85,7 @@ void QCModel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     painter->setPen(pen);
     painter->drawRect(QCM::IOLen, 0, m_bodyWidth, m_bodyHeight);
 
-    if (option->state & QStyle::State_Selected)
+    if (option->state & QStyle::State_Sunken)
     {
         pen.setStyle(Qt::DashDotLine);
         pen.setColor(Qt::red);

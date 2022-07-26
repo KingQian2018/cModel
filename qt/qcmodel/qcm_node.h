@@ -23,8 +23,9 @@ public:
     int type() const override { return Type; }
 
     void addLine(QCM_Line *line);
-    QVector<QCM_Line *> lines() const { return m_lines; }
-    void adjust();
+    void removeLine(QCM_Line *line);
+    
+    QList<QCM_Line *> lines() const { return m_lines; }
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) { setCursor(Qt::DragMoveCursor); }
@@ -35,7 +36,7 @@ protected:
 
 private:
     QRectF m_rect;
-    QVector<QCM_Line *> m_lines;
+    QList<QCM_Line *> m_lines;
 
     void setRect(const QRectF &rect);
     void init();

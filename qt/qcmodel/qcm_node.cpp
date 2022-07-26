@@ -81,10 +81,20 @@ void QCM_Node::addLine(QCM_Line *line)
     line->adjust();
 }
 
+void QCM_Node::removeLine(QCM_Line *line)
+{
+    auto idx = m_lines.indexOf(line);
+    if (idx != -1)
+    {
+        m_lines.removeAt(idx);
+        line->adjust();
+    }
+}
+
 QPainterPath QCM_Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-1, -1, 2, 2);
+    path.addEllipse(-1, -1, 3, 3);
     return path;
 }
 
@@ -98,8 +108,4 @@ void QCM_Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mouseReleaseEvent(event);
-}
-
-void QCM_Node::adjust()
-{
 }

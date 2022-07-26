@@ -2,20 +2,21 @@
 #include "qcm_line.h"
 
 QCM_Line::QCM_Line(QCM_Node *sourceNode, QCM_Node *destNode)
-    : m_source(sourceNode), m_dest(destNode)
+    : m_sourceNode(sourceNode), m_destNode(destNode)
 {
-    m_source->setFlag(ItemIsMovable);
-    m_source->setFlag(ItemSendsGeometryChanges);
-    m_source->setAcceptHoverEvents(true);
-    m_source->addLine(this);
+    m_sourceNode->setFlag(ItemIsMovable);
+    m_sourceNode->setFlag(ItemSendsGeometryChanges);
+    m_sourceNode->setAcceptHoverEvents(true);
+    m_sourceNode->addLine(this);
 
-    m_dest->setFlag(ItemIsMovable);
-    m_dest->setFlag(ItemSendsGeometryChanges);
-    m_dest->setAcceptHoverEvents(true);
-    m_dest->addLine(this);
+    m_destNode->setFlag(ItemIsMovable);
+    m_destNode->setFlag(ItemSendsGeometryChanges);
+    m_destNode->setAcceptHoverEvents(true);
+    m_destNode->addLine(this);
 
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
+    setFlag(ItemIsSelectable);
     setZValue(-1);
 
     adjust();
@@ -23,10 +24,10 @@ QCM_Line::QCM_Line(QCM_Node *sourceNode, QCM_Node *destNode)
 
 void QCM_Line::adjust()
 {
-    if (!m_source || !m_dest)
+    if (!m_sourceNode || !m_destNode)
         return;
 
-    QLineF line(mapFromItem(m_source, 0, 0), mapFromItem(m_dest, 0, 0));
+    QLineF line(mapFromItem(m_sourceNode, 0, 0), mapFromItem(m_destNode, 0, 0));
     qreal length = line.length();
 
     prepareGeometryChange();
@@ -45,7 +46,7 @@ void QCM_Line::adjust()
 
 QRectF QCM_Line::boundingRect() const
 {
-    if (!m_source || !m_dest)
+    if (!m_sourceNode || !m_destNode)
         return QRectF();
 
     qreal penWidth = 3;
@@ -59,7 +60,7 @@ QRectF QCM_Line::boundingRect() const
 
 void QCM_Line::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if (!m_source || !m_dest)
+    if (!m_sourceNode || !m_destNode)
         return;
 
     QLineF line(m_sourcePoint, m_destPoint);
@@ -67,7 +68,14 @@ void QCM_Line::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         return;
 
     // Draw the line itself
-    painter->setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    if (option->state & QStyle::State_Sunken)
+    {
+        painter->setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    }
+    else
+    {
+        painter->setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    }
     painter->drawLine(line);
 }
 
@@ -80,11 +88,20 @@ QVariant QCM_Line::itemChange(GraphicsItemChange change, const QVariant &value)
     else if (change == ItemPositionHasChanged)
     {
         m_dltPos = value.toPointF() - m_dltPos;
-        m_source->setPos(m_source->pos() + m_dltPos);
-        m_dest->setPos(m_dest->pos() + m_dltPos);
+        m_sourceNode->setPos(m_sourceNode->pos() + m_dltPos);
+        m_destNode->setPos(m_destNode->pos() + m_dltPos);
         m_dltPos = value.toPointF();
     }
     return QGraphicsItem::itemChange(change, value);
+}
+
+void QCM_Line::addNode(QCM_Node *node)
+{
+    scene()->addItem(node);
+    m_sourceNode->removeLine(this);
+    scene()->addItem(new QCM_Line(m_sourceNode, node));
+    m_sourceNode = node;
+    node->addLine(this);
 }
 
 void QCM_PreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
