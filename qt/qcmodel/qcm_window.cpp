@@ -75,8 +75,11 @@ void QCM_Window::btnClicked()
     {
         QCM_Node *node1 = new QCM_Node(QCM::AlignToGrid(100, 0));
         QCM_Node *node2 = new QCM_Node(QCM::AlignToGrid(30, 30));
+        QCM_Node *node3 = new QCM_Node(QCM::AlignToGrid(30, 90));
         m_scene->addItem(node1);
         m_scene->addItem(node2);
+        m_scene->addItem(node3);
         m_scene->addItem(new QCM_Line(node1, node2));
+        m_scene->addItem(new QCM_PreLine(node2, node3));
     }
 }

@@ -86,3 +86,17 @@ QVariant QCM_Line::itemChange(GraphicsItemChange change, const QVariant &value)
     }
     return QGraphicsItem::itemChange(change, value);
 }
+
+void QCM_PreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    if (!sourceNode() || !destNode())
+        return;
+
+    QLineF line(sourcePoint(), destPoint());
+    if (qFuzzyCompare(line.length(), qreal(0.)))
+        return;
+
+    // Draw the line itself
+    painter->setPen(QPen(Qt::black, 3, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->drawLine(line);
+}

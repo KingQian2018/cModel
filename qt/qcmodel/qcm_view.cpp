@@ -84,14 +84,6 @@ void QCM_View::mouseReleaseEvent(QMouseEvent *event)
         if (m_isSetLink)
         {
             m_isSetLink = false;
-            foreach (auto i, scene()->items())
-            {
-                if (i->type() == QCM::PRE_NODE_LINE)
-                {
-                    scene()->removeItem(i);
-                    break;
-                }
-            }
         }
         isMousePressed = false;
     }

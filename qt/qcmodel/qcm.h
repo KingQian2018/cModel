@@ -49,9 +49,9 @@ namespace QCM
         MODEL,
         NODE,
         LINE,
+        PRE_LINE,
         NODE_LINE,
         NODE_LINES,
-        PRE_NODE_LINE,
     };
 
     static uint Grid = 30;
