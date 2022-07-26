@@ -15,6 +15,8 @@ public:
 
     uint ID() const { return m_ID; }
     virtual QCModel *copy();
+    enum { Type = UserType + QCM::MODEL };
+    int type() const override { return Type; }
 
 protected:
     uint m_ID;

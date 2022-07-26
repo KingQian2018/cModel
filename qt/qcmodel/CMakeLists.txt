@@ -16,12 +16,10 @@ add_library(lib_qcmodel
     qcm_view.h
     qcm_scene.cpp 
     qcm_scene.h
-    qcm_nodeline.cpp 
-    qcm_nodeline.h
     qcm_node.cpp 
     qcm_node.h
-    qcm_linknodes.cpp
-    qcm_linknodes.h
+    qcm_line.cpp 
+    qcm_line.h
     ${qcmodel}
     )
 

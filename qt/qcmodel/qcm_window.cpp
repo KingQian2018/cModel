@@ -40,9 +40,6 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
         toolBtn->setGeometry(290, 0, 60, 20);
         m_btns.append(toolBtn);
         connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
-
-        m_nodeLine = new QCM_NodeLine();
-        m_scene->addItem(m_nodeLine);
     }
 
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
@@ -76,11 +73,10 @@ void QCM_Window::btnClicked()
     }
     else if (b->text() == "Link")
     {
-        m_scene->addLinks(new QCM_LinkNodes(m_scene));
-        connect(m_view, SIGNAL(setLinked(QPointF)),
-                m_scene->links().last(), SLOT(addNode(QPointF)));
-        connect(m_view, SIGNAL(movePreLinked(QPointF)),
-                m_scene->links().last(), SLOT(movePreNode(QPointF)));
-        m_view->setLink(true);
+        QCM_Node *node1 = new QCM_Node(QCM::AlignToGrid(100, 0));
+        QCM_Node *node2 = new QCM_Node(QCM::AlignToGrid(30, 30));
+        m_scene->addItem(node1);
+        m_scene->addItem(node2);
+        m_scene->addItem(new QCM_Line(node1, node2));
     }
 }

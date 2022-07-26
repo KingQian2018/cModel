@@ -3,6 +3,8 @@
 
 #include <QMenu>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneWheelEvent>
+#include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
@@ -46,13 +48,10 @@ namespace QCM
     {
         MODEL,
         NODE,
+        LINE,
         NODE_LINE,
+        NODE_LINES,
         PRE_NODE_LINE,
-    };
-
-    enum ItemKey_TYPE
-    {
-        ITEM_CLASS = 0,
     };
 
     static uint Grid = 30;
@@ -60,6 +59,7 @@ namespace QCM
     {
         Grid = grid;
     }
+
     static QPointF AlignToGrid(QPointF newPos)
     {
         int h = qRound(newPos.x() / Grid);
@@ -71,6 +71,11 @@ namespace QCM
         newPos.setY(pos);
         return newPos;
     }
+
+    static QPointF AlignToGrid(qreal x, qreal y) { return AlignToGrid(QPointF(x, y)); }
+
+    class QCM_Node;
+    class QCM_Line;
 }
 
 #endif // QCM_H

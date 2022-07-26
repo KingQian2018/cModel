@@ -1,4 +1,6 @@
+#include "qcm_line.h"
 #include "qcm_node.h"
+
 QCM_Node::QCM_Node(QGraphicsItem *parent) : QGraphicsItem(parent)
 {
     init();
@@ -19,15 +21,12 @@ QCM_Node::~QCM_Node()
 
 void QCM_Node::init()
 {
-    setRect(QRect(0, 0, 3, 3));
-    setData(QCM::ItemKey_TYPE::ITEM_CLASS, QCM::NODE);
+    setCacheMode(DeviceCoordinateCache);
 }
 
 QRectF QCM_Node::boundingRect() const
 {
-    QRectF _rect = m_rect;
-    _rect.adjust(-3, -3, 3, 3);
-    return _rect;
+    return QRectF(-1, -1, 3, 3);
 }
 
 void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -39,7 +38,7 @@ void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     {
         foreach (auto _item, scene()->collidingItems(this))
         {
-            if (_item->data(QCM::ItemKey_TYPE::ITEM_CLASS) == QCM::NODE)
+            if (_item->type() == QCM::NODE)
             {
                 pen.setColor(Qt::blue);
             }
@@ -60,12 +59,47 @@ void QCM_Node::setRect(const QRectF &rect)
     update();
 }
 
-#include "qcm_scene.h"
 QVariant QCM_Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemPositionChange)
     {
         return QCM::AlignToGrid(value.toPointF());
     }
+    else if (change == ItemPositionHasChanged)
+    {
+        for (auto line : qAsConst(m_lines))
+        {
+            line->adjust();
+        }
+    }
     return QGraphicsItem::itemChange(change, value);
+}
+
+void QCM_Node::addLine(QCM_Line *line)
+{
+    m_lines << line;
+    line->adjust();
+}
+
+QPainterPath QCM_Node::shape() const
+{
+    QPainterPath path;
+    path.addEllipse(-1, -1, 2, 2);
+    return path;
+}
+
+void QCM_Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    update();
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void QCM_Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    update();
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
+void QCM_Node::adjust()
+{
 }

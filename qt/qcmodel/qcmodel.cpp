@@ -21,15 +21,12 @@ QCModel::QCModel(const QCModel &cmodel)
 
 void QCModel::initModel()
 {
-    setData(QCM::ITEM_CLASS, QCM::MODEL);
-    // setPen(pen);
-
     uint _i = m_AI.count() + m_DI.count();
     uint _o = m_AO.count() + m_DO.count();
     m_bodyHeight = ((_i > _o ? _i : _o) + 1) * QCM::IOGrap;
-    setFlags(QGraphicsItem::ItemIsMovable |
-             QGraphicsItem::ItemIsSelectable |
-             QGraphicsItem::ItemSendsGeometryChanges);
+    setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIsSelectable);
+    setFlag(QGraphicsItem::ItemSendsGeometryChanges);
 
     m_nameText = new QGraphicsTextItem(this);
     m_nameText->setPlainText(m_name + QString::number(m_ID));

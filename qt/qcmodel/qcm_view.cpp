@@ -9,7 +9,6 @@ void QCM_View::wheelEvent(QWheelEvent *event)
     int wheelValue = event->angleDelta().y();
     double _ratio = (double)wheelValue / (double)1200 + 1;
     scale(_ratio, _ratio);
-    qDebug() << QString("transform.m11: %1").arg(transform().m11());
 }
 
 void QCM_View::mousePressEvent(QMouseEvent *event)
@@ -87,15 +86,11 @@ void QCM_View::mouseReleaseEvent(QMouseEvent *event)
             m_isSetLink = false;
             foreach (auto i, scene()->items())
             {
-                if (i->data(QCM::ITEM_CLASS) == QCM::PRE_NODE_LINE)
+                if (i->type() == QCM::PRE_NODE_LINE)
                 {
                     scene()->removeItem(i);
                     break;
                 }
-            }
-            foreach (auto i, ((QCM_Scene *)scene())->links())
-            {
-                i->setIsEdited(false);
             }
         }
         isMousePressed = false;

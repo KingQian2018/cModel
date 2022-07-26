@@ -55,7 +55,7 @@ void QCM_Scene::setParperSize(QCM::PaperSize_s size)
 void QCM_Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     auto items = selectedItems();
-    if (items.count() != 0 && items.at(0)->data(QCM::ITEM_CLASS) == QCM::MODEL)
+    if (items.count() != 0 && items.at(0)->type() == QCM::MODEL)
     {
         m_menu.exec(event->screenPos());
     }
