@@ -28,6 +28,7 @@ include_directories(${EASYLOGGER_INC} ${SEC_INC} ${TESTS_INC})
 
 add_subdirectory(component/easylogger/)
 add_subdirectory(component/cJson/)
+add_subdirectory(component/lua-5.4.4/)
 add_subdirectory(src/)
 add_subdirectory(qt)
 

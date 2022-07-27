@@ -51,6 +51,7 @@ target_link_libraries(PlotData
   lib_frmcustom
   lib_qcustomplot
   Qt5::Widgets
-  lib_qcmodel)
+  lib_qcmodel
+  )
 
 qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
