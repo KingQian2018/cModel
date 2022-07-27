@@ -20,6 +20,8 @@ add_library(lib_qcmodel
     qcm_node.h
     qcm_line.cpp 
     qcm_line.h
+    qcm_lua.cpp
+    qcm_lua.h
     ${qcmodel}
     )
 
@@ -27,5 +29,6 @@ target_link_libraries(lib_qcmodel
     ${Qt5Widgets_LIBRARIES}
     lib_src 
     lib_cjson
+    lib_lua
     )
 

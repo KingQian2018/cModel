@@ -57,6 +57,7 @@ set(lua_src
     ltablib.c
     luaconf.h
     lzio.h
+    lua.h
 )
 
 add_compile_options(-std=gnu99 -O2 -Wall -Wextra -DLUA_COMPAT_5_3)
