@@ -57,12 +57,13 @@ set(lua_src
     ltablib.c
     luaconf.h
     lzio.h
+    lua.h
 )
 
 add_compile_options(-std=gnu99 -O2 -Wall -Wextra -DLUA_COMPAT_5_3)
 
 add_library(lib_lua STATIC ${lua_src})
-add_executable(lua lua.h lua.c)
+add_executable(lua lua.c)
 add_executable(luac luac.c)
 target_link_libraries(lua lib_lua)
 target_link_libraries(luac lib_lua)

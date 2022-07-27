@@ -8,6 +8,8 @@
 
 #include "qcmodel/qcmodel.h"
 
+#include "qcmodel/qcm_lua.h"
+
 int main(int argc, char *argv[])
 {
     // qcm_elog_init();
@@ -29,6 +31,9 @@ int main(int argc, char *argv[])
     //初始化随机数种子
     QTime t = QTime::currentTime();
     srand(t.msec() + t.second() * 1000);
+
+    QCM_Lua _lua(argc, argv);
+    _lua.start();
 
     MainWindow w;
     w.resize(1000, 650);

@@ -43,7 +43,7 @@ else()
   )
 endif()
 
-include_directories(frmcustom 3rd_qcustomplot 3rd_qcustomplot/v2_1)
+include_directories(frmcustom 3rd_qcustomplot 3rd_qcustomplot/v2_1 ../component/lua-5.4.4)
 add_subdirectory(frmcustom)
 add_subdirectory(3rd_qcustomplot)
 add_subdirectory(qcmodel)

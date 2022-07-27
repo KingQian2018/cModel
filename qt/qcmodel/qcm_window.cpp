@@ -40,6 +40,9 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
         toolBtn->setGeometry(290, 0, 60, 20);
         m_btns.append(toolBtn);
         connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
+        QLineEdit *lineEdit = new QLineEdit(m_view);
+        lineEdit->setGeometry(360, 0, 200, 20);
+        connect(lineEdit, SIGNAL(), this, SLOT());
     }
 
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
