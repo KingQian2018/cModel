@@ -15,7 +15,10 @@ public:
 
     uint ID() const { return m_ID; }
     virtual QCModel *copy();
-    enum { Type = UserType + QCM::MODEL };
+    enum
+    {
+        Type = UserType + QCM::MODEL
+    };
     int type() const override { return Type; }
 
 protected:
@@ -27,10 +30,12 @@ private:
     QList<QCM_IO *> m_ios;
     QString m_name;
     QGraphicsTextItem *m_nameText;
-    
+
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     void initModel();
 };

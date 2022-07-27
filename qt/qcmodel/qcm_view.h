@@ -26,6 +26,7 @@ private:
     bool isMousePressed = false;
     bool m_isSetLink = false;
     QPoint posAnchor;
+    void scaleView(qreal scaleFactor);
 
 signals:
     void posChanged(QPointF pos);

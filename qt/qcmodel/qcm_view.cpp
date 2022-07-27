@@ -4,11 +4,18 @@
 #include <QMouseEvent>
 #include <QDebug>
 
+void QCM_View::scaleView(qreal scaleFactor)
+{
+    qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+    if (factor < 0.1 || factor > 80)
+        return;
+
+    scale(scaleFactor, scaleFactor);
+}
+
 void QCM_View::wheelEvent(QWheelEvent *event)
 {
-    int wheelValue = event->angleDelta().y();
-    double _ratio = (double)wheelValue / (double)1200 + 1;
-    scale(_ratio, _ratio);
+    scaleView(pow(2., event->angleDelta().y() / 240.0));
 }
 
 void QCM_View::mousePressEvent(QMouseEvent *event)

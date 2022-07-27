@@ -26,7 +26,7 @@ void QCM_Node::init()
 
 QRectF QCM_Node::boundingRect() const
 {
-    return QRectF(-1, -1, 3, 3);
+    return shape().boundingRect();
 }
 
 void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -94,7 +94,7 @@ void QCM_Node::removeLine(QCM_Line *line)
 QPainterPath QCM_Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-1, -1, 3, 3);
+    path.addEllipse(-2, -2, 4, 4);
     return path;
 }
 

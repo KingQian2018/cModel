@@ -29,6 +29,9 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     QPointF sourcePoint() const { return m_sourcePoint; }
     QPointF destPoint() const { return m_destPoint; }
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    QPainterPath shape() const;
 
 private:
     QCM_Node *m_sourceNode, *m_destNode;

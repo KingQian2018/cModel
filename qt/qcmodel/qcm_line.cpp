@@ -68,7 +68,7 @@ void QCM_Line::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         return;
 
     // Draw the line itself
-    if (option->state & QStyle::State_Sunken)
+    if (option->state & QStyle::State_Selected)
     {
         painter->setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     }
@@ -77,6 +77,20 @@ void QCM_Line::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     }
     painter->drawLine(line);
+}
+
+QPainterPath QCM_Line::shape() const
+{
+    QLineF line(m_sourcePoint, m_destPoint);
+    QPainterPath path;
+    path.moveTo(m_sourcePoint);
+    path.lineTo(m_destPoint);
+    QPainterPathStroker stroker;
+    stroker.setWidth(10);
+    stroker.setJoinStyle(Qt::MiterJoin);
+    stroker.setCapStyle(Qt::RoundCap);
+    stroker.setDashPattern(Qt::DashLine);
+    return stroker.createStroke(path);
 }
 
 QVariant QCM_Line::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -102,6 +116,18 @@ void QCM_Line::addNode(QCM_Node *node)
     scene()->addItem(new QCM_Line(m_sourceNode, node));
     m_sourceNode = node;
     node->addLine(this);
+}
+
+void QCM_Line::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    update();
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void QCM_Line::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    update();
+    QGraphicsItem::mouseReleaseEvent(event);
 }
 
 void QCM_PreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

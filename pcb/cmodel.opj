@@ -1,0 +1,49 @@
+(ExpressProject "cmodel"
+  (ProjectVersion "19981106")
+  (ProjectType "PCB")
+  (Folder "Design Resources"
+    (Folder "Library")
+    (NoModify)
+    (File ".\cmodel.dsn"
+      (Type "Schematic Design"))
+    (BuildFileAddedOrDeleted "x")
+    (CompileFileAddedOrDeleted "x"))
+  (Folder "Outputs")
+  (Folder "Referenced Projects")
+  (PartMRUSelector)
+  (GlobalState
+    (FileView
+      (Path "Design Resources")
+      (Path "Design Resources"
+         "D:\Users\KisWang\Documents\kw_cModel\pcb\cmodel.dsn")
+      (Path "Design Resources"
+         "D:\Users\KisWang\Documents\kw_cModel\pcb\cmodel.dsn" "SCHEMATIC1")
+      (Select "Design Resources"
+         "D:\Users\KisWang\Documents\kw_cModel\pcb\cmodel.dsn" "SCHEMATIC1"
+         "PAGE02-Dialog"))
+    (HierarchyView)
+    (Doc
+      (Type "COrCapturePMDoc")
+      (Frame
+        (Placement "44 0 1 -1 -1 -8 -31 0 200 0 650"))
+      (Tab 0))
+    (Doc
+      (Type "COrSchematicDoc")
+      (Frame
+        (Placement "44 0 1 -1 -1 -8 -31 208 2383 208 897")
+        (Scroll "-242 0")
+        (Zoom "100")
+        (Occurrence "/"))
+      (Path "D:\USERS\KISWANG\DOCUMENTS\KW_CMODEL\PCB\CMODEL.DSN")
+      (Schematic "SCHEMATIC1")
+      (Page "PAGE01-CONTENT"))
+    (Doc
+      (Type "COrSchematicDoc")
+      (Frame
+        (Placement "44 2 3 -1 -1 -8 -31 234 2409 234 923")
+        (Scroll "0 171")
+        (Zoom "168")
+        (Occurrence "/"))
+      (Path "D:\USERS\KISWANG\DOCUMENTS\KW_CMODEL\PCB\CMODEL.DSN")
+      (Schematic "SCHEMATIC1")
+      (Page "PAGE02-Dialog"))))

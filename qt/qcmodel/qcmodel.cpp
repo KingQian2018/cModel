@@ -85,7 +85,7 @@ void QCModel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     painter->setPen(pen);
     painter->drawRect(QCM::IOLen, 0, m_bodyWidth, m_bodyHeight);
 
-    if (option->state & QStyle::State_Sunken)
+    if (option->state & QStyle::State_Selected)
     {
         pen.setStyle(Qt::DashDotLine);
         pen.setColor(Qt::red);
@@ -93,4 +93,16 @@ void QCModel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         painter->setPen(pen);
         painter->drawRect(-5, -5, m_bodyWidth + 2 * QCM::IOLen + 10, m_bodyHeight + 10);
     }
+}
+
+void QCModel::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    update();
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void QCModel::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    update();
+    QGraphicsItem::mouseReleaseEvent(event);
 }

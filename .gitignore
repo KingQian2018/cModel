@@ -21,3 +21,5 @@ libcjson_utils.so.*
 cmake-build-debug
 *.lst
 *.lss
+
+*.DBK
