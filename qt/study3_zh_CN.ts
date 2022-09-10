@@ -9,6 +9,16 @@
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="mainwindow.cpp" line="41"/>
+        <source>&amp;Open Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="43"/>
+        <source>Open a project.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>frmRealtimeData</name>

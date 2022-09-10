@@ -36,6 +36,15 @@ void MainWindow::initWidgets()
     ui->stackedWidget->addWidget(new QCM_Window);
 }
 
+void MainWindow::initMenu()
+{
+    openAction = new QAction(tr("&Open Project"), this);
+    openAction->setShortcut(QKeySequence::Open);
+    openAction->setStatusTip(tr("Open a project."));
+
+    // QMenu *file = menubar
+}
+
 void MainWindow::initForm()
 {
     //颜色集合供其他界面使用

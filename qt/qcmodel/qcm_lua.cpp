@@ -703,6 +703,7 @@ int qcm_main(int argc, char **argv)
 }
 #endif
 
+extern void registerLua(lua_State *L);
 QCM_Lua::QCM_Lua(int argc, char **argv, QObject *parent)
 {
   m_L = luaL_newstate(); /* create state */
@@ -710,6 +711,7 @@ QCM_Lua::QCM_Lua(int argc, char **argv, QObject *parent)
   lua_pushcfunction(m_L, &pmain);   /* to call 'pmain' in protected mode */
   lua_pushinteger(m_L, argc);       /* 1st argument */
   lua_pushlightuserdata(m_L, argv); /* 2nd argument */
+  registerLua(m_L);
   qDebug("init lua");
 }
 

@@ -7,6 +7,7 @@
 #include <qlayout.h>
 #include <QLabel>
 #include <QComboBox>
+#include <QAction>
 
 #include "qcmodel/qcm_window.h"
 
@@ -37,11 +38,14 @@ private:
     QList<int> icons;
     QList<QAbstractButton *> btns;
 
+    QAction *openAction;
+
 private slots:
     void initWidgets();
     void initNav();       //初始化导航按钮
     void initIcon();      //初始化导航按钮图标
     void buttonClicked(); //导航按钮单击事件
     void initForm();
+    void initMenu();
 };
 #endif // MAINWINDOW_H

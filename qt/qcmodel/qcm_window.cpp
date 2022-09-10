@@ -1,9 +1,12 @@
 #include "qcm_window.h"
 
+QCM_Scene *g_scene;
+
 QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
 {
     m_scene = new QCM_Scene();
     m_scene->setParperSize(QCM::A4Paper);
+    g_scene = m_scene;
     m_view = new QCM_View(m_scene);
     m_poslabel = new QLabel(m_view);
     m_poslabel->setGeometry(0, 0, 100, 20);
@@ -91,4 +94,20 @@ void QCM_Window::btnClicked()
         auto _line = new QCM_Line(node1, node2);
         m_scene->addItem(_line);
     }
+}
+
+#include "lua.hpp"
+
+static int addPID(lua_State *L)
+{
+    long long a, b;
+    a = lua_tointeger(L, 1); //获取函数第一个参数
+    b = lua_tointeger(L, 2); //获取函数第二个参数
+    g_scene->addItem(new QCM_PID(1));
+    return 1;
+}
+
+void registerLua(lua_State *L)
+{
+    lua_register(L, "addPID", addPID);
 }

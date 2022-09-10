@@ -38,7 +38,7 @@ void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     {
         foreach (auto _item, scene()->collidingItems(this))
         {
-            if (_item->type() == QCM::NODE)
+            if (_item->type() == QCM::NODE + UserType)
             {
                 pen.setColor(Qt::blue);
             }
