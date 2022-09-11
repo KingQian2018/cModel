@@ -24,22 +24,19 @@ public:
 
     void addLine(QCM_Line *line);
     void removeLine(QCM_Line *line);
-    
-    QList<QCM_Line *> lines() const { return m_lines; }
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) { setCursor(Qt::DragMoveCursor); }
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) { setCursor(Qt::ArrowCursor); }
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     QRectF m_rect;
-    QList<QCM_Line *> m_lines;
+    QSet<QCM_Line *> m_lines;
 
     void setRect(const QRectF &rect);
     void init();
+    QRectF outlinkRect() const;
 };
 
 #endif // QCM_NODE_H

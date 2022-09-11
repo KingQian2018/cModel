@@ -17,6 +17,10 @@ QCM_Node::QCM_Node(QPointF pos, QGraphicsItem *parent)
 
 QCM_Node::~QCM_Node()
 {
+    foreach (QCM_Line *line, m_lines)
+    {
+        delete line;
+    }
 }
 
 void QCM_Node::init()
@@ -26,27 +30,21 @@ void QCM_Node::init()
 
 QRectF QCM_Node::boundingRect() const
 {
-    return shape().boundingRect();
+    const int Margin = 1;
+    return outlinkRect().adjusted(-Margin, -Margin, Margin, Margin);
 }
 
 void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
-    QPen pen(Qt::red);
-    if (!scene()->collidingItems(this).isEmpty())
+    if (m_lines.count() >= 3)
     {
-        foreach (auto _item, scene()->collidingItems(this))
-        {
-            if (_item->type() == QCM::NODE + UserType)
-            {
-                pen.setColor(Qt::blue);
-            }
-        }
+        QPen pen(Qt::red);
+        pen.setWidth(4);
+        painter->setPen(pen);
+        painter->drawPoint(0, 0);
     }
-    pen.setWidth(4);
-    painter->setPen(pen);
-    painter->drawPoint(0, 0);
 }
 
 void QCM_Node::setRect(const QRectF &rect)
@@ -67,45 +65,31 @@ QVariant QCM_Node::itemChange(GraphicsItemChange change, const QVariant &value)
     }
     else if (change == ItemPositionHasChanged)
     {
-        for (auto line : qAsConst(m_lines))
+        foreach (auto line, m_lines)
         {
-            line->adjust();
+            line->trackNodes();
         }
     }
     return QGraphicsItem::itemChange(change, value);
 }
 
-void QCM_Node::addLine(QCM_Line *line)
-{
-    m_lines << line;
-    line->adjust();
-}
+void QCM_Node::addLine(QCM_Line *line) { m_lines << line; }
 
-void QCM_Node::removeLine(QCM_Line *line)
-{
-    auto idx = m_lines.indexOf(line);
-    if (idx != -1)
-    {
-        m_lines.removeAt(idx);
-        line->adjust();
-    }
-}
+void QCM_Node::removeLine(QCM_Line *line) { m_lines.remove(line); }
 
 QPainterPath QCM_Node::shape() const
 {
+    QRectF rect = outlinkRect();
     QPainterPath path;
-    path.addEllipse(-2, -2, 4, 4);
+    path.addEllipse(rect);
     return path;
 }
 
-void QCM_Node::mousePressEvent(QGraphicsSceneMouseEvent *event)
+QRectF QCM_Node::outlinkRect() const
 {
-    update();
-    QGraphicsItem::mousePressEvent(event);
-}
-
-void QCM_Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    update();
-    QGraphicsItem::mouseReleaseEvent(event);
+    QRectF rect(-2, -2, 4, 4);
+    const int Padding = 8;
+    rect.adjust(-Padding, -Padding, Padding, Padding);
+    rect.translate(-rect.center());
+    return rect;
 }

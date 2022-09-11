@@ -20,6 +20,8 @@ add_library(lib_qcmodel
     qcm_node.h
     qcm_line.cpp 
     qcm_line.h
+    qcm_nodeLine.cpp
+    qcm_nodeLine.h
     qcm_lua.cpp
     qcm_lua.h
     ${qcmodel}
@@ -30,5 +32,6 @@ target_link_libraries(lib_qcmodel
     lib_src 
     lib_cjson
     liblua
+    lib_qcm_dialog
     )
 

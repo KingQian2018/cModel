@@ -9,19 +9,17 @@ class QCM_Node;
 class QCM_Line : public QGraphicsItem
 {
 public:
-    QCM_Line(QCM_Node *sourceNode, QCM_Node *destNode);
-    ~QCM_Line() {}
+    QCM_Line(QCM_Node *fromNode, QCM_Node *toNode);
+    ~QCM_Line();
 
     enum
     {
         Type = UserType + QCM::LINE
     };
     int type() const override { return Type; }
-    void adjust();
-    QCM_Node *sourceNode() const { return m_sourceNode; }
-    QCM_Node *destNode() const { return m_destNode; }
-
-    void addNode(QCM_Node *);
+    void trackNodes();
+    QCM_Node *sourceNode() const { return m_fromNode; }
+    QCM_Node *destNode() const { return m_toNode; }
 
 protected:
     QRectF boundingRect() const;
@@ -34,7 +32,7 @@ protected:
     QPainterPath shape() const;
 
 private:
-    QCM_Node *m_sourceNode, *m_destNode;
+    QCM_Node *m_fromNode, *m_toNode;
     QPointF m_dltPos;
     QPointF m_sourcePoint;
     QPointF m_destPoint;

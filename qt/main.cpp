@@ -5,10 +5,10 @@
 #include <QFontDatabase>
 #include <QTime>
 #include <QDebug>
+#include <QTranslator>
 
 #include "qcmodel/qcmodel.h"
-
-#include "qcmodel/qcm_lua.h"
+#include "qcmodel/qcm_window.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,10 +32,14 @@ int main(int argc, char *argv[])
     QTime t = QTime::currentTime();
     srand(t.msec() + t.second() * 1000);
 
-    QCM_Lua _lua(argc, argv);
-    _lua.start();
+    QTranslator *translator=new QTranslator();
+    translator->load("study3_zh_CN.qm");
+    a.installTranslator(translator);
 
-    MainWindow w;
+    // MainWindow w(argc, argv);
+    // w.resize(1000, 650);
+    // w.show();
+    QCM_Window w;
     w.resize(1000, 650);
     w.show();
     return a.exec();

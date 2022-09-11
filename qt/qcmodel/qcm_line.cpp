@@ -2,32 +2,40 @@
 #include "qcm_line.h"
 
 QCM_Line::QCM_Line(QCM_Node *sourceNode, QCM_Node *destNode)
-    : m_sourceNode(sourceNode), m_destNode(destNode)
+    : m_fromNode(sourceNode), m_toNode(destNode)
 {
-    m_sourceNode->setFlag(ItemIsMovable);
-    m_sourceNode->setFlag(ItemSendsGeometryChanges);
-    m_sourceNode->setAcceptHoverEvents(true);
-    m_sourceNode->addLine(this);
+    m_fromNode->setFlag(ItemIsMovable);
+    m_fromNode->setFlag(ItemIsSelectable);
+    m_fromNode->setFlag(ItemSendsGeometryChanges);
+    m_fromNode->setAcceptHoverEvents(true);
+    m_fromNode->addLine(this);
 
-    m_destNode->setFlag(ItemIsMovable);
-    m_destNode->setFlag(ItemSendsGeometryChanges);
-    m_destNode->setAcceptHoverEvents(true);
-    m_destNode->addLine(this);
+    m_toNode->setFlag(ItemIsMovable);
+    m_toNode->setFlag(ItemIsSelectable);
+    m_toNode->setFlag(ItemSendsGeometryChanges);
+    m_toNode->setAcceptHoverEvents(true);
+    m_toNode->addLine(this);
 
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setFlag(ItemIsSelectable);
     setZValue(-1);
 
-    adjust();
+    trackNodes();
 }
 
-void QCM_Line::adjust()
+QCM_Line::~QCM_Line()
 {
-    if (!m_sourceNode || !m_destNode)
+    m_fromNode->removeLine(this);
+    m_toNode->removeLine(this);
+}
+
+void QCM_Line::trackNodes()
+{
+    if (!m_fromNode || !m_toNode)
         return;
 
-    QLineF line(mapFromItem(m_sourceNode, 0, 0), mapFromItem(m_destNode, 0, 0));
+    QLineF line(mapFromItem(m_fromNode, 0, 0), mapFromItem(m_toNode, 0, 0));
     qreal length = line.length();
 
     prepareGeometryChange();
@@ -46,7 +54,7 @@ void QCM_Line::adjust()
 
 QRectF QCM_Line::boundingRect() const
 {
-    if (!m_sourceNode || !m_destNode)
+    if (!m_fromNode || !m_toNode)
         return QRectF();
 
     qreal penWidth = 3;
@@ -60,7 +68,7 @@ QRectF QCM_Line::boundingRect() const
 
 void QCM_Line::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if (!m_sourceNode || !m_destNode)
+    if (!m_fromNode || !m_toNode)
         return;
 
     QLineF line(m_sourcePoint, m_destPoint);
@@ -102,20 +110,11 @@ QVariant QCM_Line::itemChange(GraphicsItemChange change, const QVariant &value)
     else if (change == ItemPositionHasChanged)
     {
         m_dltPos = value.toPointF() - m_dltPos;
-        m_sourceNode->setPos(m_sourceNode->pos() + m_dltPos);
-        m_destNode->setPos(m_destNode->pos() + m_dltPos);
+        m_fromNode->setPos(m_fromNode->pos() + m_dltPos);
+        m_toNode->setPos(m_toNode->pos() + m_dltPos);
         m_dltPos = value.toPointF();
     }
     return QGraphicsItem::itemChange(change, value);
-}
-
-void QCM_Line::addNode(QCM_Node *node)
-{
-    scene()->addItem(node);
-    m_sourceNode->removeLine(this);
-    scene()->addItem(new QCM_Line(m_sourceNode, node));
-    m_sourceNode = node;
-    node->addLine(this);
 }
 
 void QCM_Line::mousePressEvent(QGraphicsSceneMouseEvent *event)

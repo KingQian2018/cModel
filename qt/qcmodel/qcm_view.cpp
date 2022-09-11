@@ -3,6 +3,7 @@
 
 #include <QMouseEvent>
 #include <QDebug>
+#include <qmath.h>
 
 void QCM_View::scaleView(qreal scaleFactor)
 {
@@ -35,8 +36,7 @@ void QCM_View::mousePressEvent(QMouseEvent *event)
     {
         if (m_isSetLink)
         {
-            auto _point = mapToScene(event->pos());
-            emit setLinked(_point);
+            ((QCM_Scene *)scene())->linkClicked();
         }
     }
 }
@@ -60,26 +60,8 @@ void QCM_View::mouseMoveEvent(QMouseEvent *event)
 
         // posAnchor是MyGraphicsView的私有成员变量，用以记录每次的事件结束时候的鼠标位置
         posAnchor = event->pos();
-        if (cursor() != Qt::ClosedHandCursor)
-        {
-            setCursor(Qt::ClosedHandCursor);
-        }
     }
-    else if (m_isSetLink)
-    {
-        if (cursor() != Qt::CrossCursor)
-        {
-            setCursor(Qt::CrossCursor);
-        }
-        emit movePreLinked(mapToScene(event->pos()));
-    }
-    else
-    {
-        if (cursor() != Qt::ArrowCursor)
-        {
-            setCursor(Qt::ArrowCursor);
-        }
-    }
+    ((QCM_Scene *)scene())->linkMove(m_isSetLink, mapToScene(event->pos()));
     emit posChanged(mapToScene(event->pos()));
 }
 

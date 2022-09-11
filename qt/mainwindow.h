@@ -10,6 +10,7 @@
 #include <QAction>
 
 #include "qcmodel/qcm_window.h"
+#include "qcmodel/qcm_lua.h"
 
 class QAbstractButton;
 
@@ -25,7 +26,7 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(int argc, char *argv[], QWidget *parent = nullptr);
     ~MainWindow();
 
 protected:
@@ -34,6 +35,7 @@ protected:
 private:
     Ui::MainWindow *ui;
     static QList<QColor> colors;
+    QCM_Lua *m_lua;
 
     QList<int> icons;
     QList<QAbstractButton *> btns;

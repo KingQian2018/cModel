@@ -47,6 +47,7 @@ include_directories(frmcustom 3rd_qcustomplot 3rd_qcustomplot/v2_1 ../component/
 add_subdirectory(frmcustom)
 add_subdirectory(3rd_qcustomplot)
 add_subdirectory(qcmodel)
+add_subdirectory(qcmodel/dialog)
 target_link_libraries(PlotData
   lib_frmcustom
   lib_qcustomplot

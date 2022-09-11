@@ -14,7 +14,7 @@
 
 #include "qcm_pid.h"
 
-class QCM_Window : public QWidget
+class QCM_Window : public QMainWindow
 {
     Q_OBJECT
 public:
@@ -25,18 +25,40 @@ private:
     QCM_View *m_view;
     QCM_Scene *m_scene;
     QLabel *m_poslabel;
-    QComboBox *m_select;
     QList<QAbstractButton *> m_btns;
     QVBoxLayout *m_vboxlayout;
     QCM_Node *m_node;
 
-    bool isSetLink;
+    QMenu *fileMenu;
+    QMenu *editMenu;
+    QMenu *toolMenu;
+    QMenu *optionsMenu;
+    QMenu *helpMenu;
+
+    QToolBar *fileToolBar;
+    QToolBar *editToolBar;
+    QToolBar *toolToolBar;
+    QToolBar *optionsToolBar;
+    QToolBar *helpToolBar;
+
+    QAction *addLineAction;
+    QAction *deleteLinesAction;
+    QAction *escAction;
+    QAction *exitAction;
+    QAction *perferenceseAction;
+
+    void createAction();
+    void createMenu();
+    void createToolBar();
 
 private slots:
     void viewMouseMoved(QPointF pos);
     void paperSizeChanged(int index);
     void gridChanged(int index);
-    void btnClicked();
+
+    void addLine();
+    void esc();
+    void perferencese();
 };
 
 #endif // QCM_WINDOW_H

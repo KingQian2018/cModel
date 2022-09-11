@@ -24,3 +24,5 @@ cmake-build-debug
 
 *.DBK
 *.DSNlck
+
+*.qm

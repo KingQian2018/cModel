@@ -10,9 +10,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsLineItem>
 #include <QStyleOptionGraphicsItem>
-#include <QtGui>
-#include <QtGui/qpen.h>
-#include <QtGui/qpainter.h>
+#include <QPen>
+#include <QPainter>
+#include <QPainterPath>
 
 namespace QCM
 {

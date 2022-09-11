@@ -1,29 +1,21 @@
 #include "qcm_window.h"
+#include "dialog/qcm_dialog.h"
 
 QCM_Scene *g_scene;
 
-QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
+QCM_Window::QCM_Window(QWidget *parent) : QMainWindow(parent)
 {
     m_scene = new QCM_Scene();
     m_scene->setParperSize(QCM::A4Paper);
     g_scene = m_scene;
     m_view = new QCM_View(m_scene);
+    m_view->setDragMode(QGraphicsView::RubberBandDrag);
+    m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
     m_poslabel = new QLabel(m_view);
     m_poslabel->setGeometry(0, 0, 100, 20);
 
-    m_vboxlayout = new QVBoxLayout(this);
-    m_vboxlayout->addWidget(m_view);
-
-    m_select = new QComboBox(m_view);
-    QStringList selectStr;
-    selectStr << "A2"
-              << "A3"
-              << "A4";
-    m_select->addItems(selectStr);
-    m_select->setGeometry(100, 0, 50, 20);
-    m_select->setCurrentIndex(2);
-    connect(m_select, SIGNAL(currentIndexChanged(int)), this, SLOT(paperSizeChanged(int)));
-
+    setCentralWidget(m_view);
     {
         auto selectGrid = new QComboBox(m_view);
         selectGrid->addItems(QStringList({"10", "20", "30", "40", "50", "60"}));
@@ -32,23 +24,10 @@ QCM_Window::QCM_Window(QWidget *parent) : QWidget(parent)
         connect(selectGrid, SIGNAL(currentIndexChanged(int)), this, SLOT(gridChanged(int)));
     }
 
-    {
-        QToolButton *toolBtn = new QToolButton(m_view);
-        toolBtn->setText("Link");
-        toolBtn->setGeometry(220, 0, 60, 20);
-        m_btns.append(toolBtn);
-        connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
-        toolBtn = new QToolButton(m_view);
-        toolBtn->setText("PID");
-        toolBtn->setGeometry(290, 0, 60, 20);
-        m_btns.append(toolBtn);
-        connect(toolBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
-        QLineEdit *lineEdit = new QLineEdit(m_view);
-        lineEdit->setGeometry(360, 0, 200, 20);
-        connect(lineEdit, SIGNAL(), this, SLOT());
-    }
-
     connect(m_view, SIGNAL(posChanged(QPointF)), this, SLOT(viewMouseMoved(QPointF)));
+    createAction();
+    createToolBar();
+    createMenu();
 }
 
 QCM_Window::~QCM_Window()
@@ -70,32 +49,6 @@ void QCM_Window::gridChanged(int index)
     QCM::SetGrid((index + 1) * 10);
 }
 
-void QCM_Window::btnClicked()
-{
-    QAbstractButton *b = (QAbstractButton *)sender();
-    if (b->text() == "PID")
-    {
-        QCM_Node *node3 = new QCM_Node(QCM::AlignToGrid(30, 90));
-        for (auto l : m_scene->items())
-        {
-            if (l->type() == QGraphicsItem::UserType + QCM::LINE && l->isSelected())
-            {
-                ((QCM_Line *)l)->addNode(node3);
-            }
-        }
-        m_scene->addItem(new QCM_PID(1));
-    }
-    else if (b->text() == "Link")
-    {
-        QCM_Node *node1 = new QCM_Node(QCM::AlignToGrid(100, 0));
-        QCM_Node *node2 = new QCM_Node(QCM::AlignToGrid(30, 30));
-        m_scene->addItem(node1);
-        m_scene->addItem(node2);
-        auto _line = new QCM_Line(node1, node2);
-        m_scene->addItem(_line);
-    }
-}
-
 #include "lua.hpp"
 
 static int addPID(lua_State *L)
@@ -110,4 +63,80 @@ static int addPID(lua_State *L)
 void registerLua(lua_State *L)
 {
     lua_register(L, "addPID", addPID);
+}
+
+void QCM_Window::createAction()
+{
+    addLineAction = new QAction(tr("Add Line"));
+    addLineAction->setStatusTip(tr("Add Line"));
+    connect(addLineAction, SIGNAL(triggered()), this, SLOT(addLine()));
+
+    deleteLinesAction = new QAction(tr("Delete Lines"));
+    deleteLinesAction->setStatusTip(tr("Delete Lines"));
+    connect(deleteLinesAction, SIGNAL(triggered()), m_scene, SLOT(deleteLines()));
+
+    escAction = new QAction(tr("Esc"));
+    escAction->setShortcut(tr("ESC"));
+    connect(escAction, SIGNAL(triggered()), this, SLOT(esc()));
+
+    exitAction = new QAction(tr("E&xit"));
+    exitAction->setShortcut(QKeySequence::Quit);
+    connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+    perferenceseAction = new QAction(tr("&Preferences..."));
+    perferenceseAction->setStatusTip(tr("Preferences Setting"));
+    connect(perferenceseAction, SIGNAL(triggered()), this, SLOT(perferencese()));
+}
+
+void QCM_Window::createMenu()
+{
+    fileMenu = menuBar()->addMenu(tr("&File"));
+    editMenu = menuBar()->addMenu(tr("&Edit"));
+    toolMenu = menuBar()->addMenu(tr("&Tool"));
+    optionsMenu = menuBar()->addMenu(tr("&Options"));
+    helpMenu = menuBar()->addMenu(tr("&Help"));
+
+    fileMenu->addAction(exitAction);
+
+    editMenu->addAction(addLineAction);
+    editMenu->addAction(deleteLinesAction);
+    editMenu->addAction(escAction);
+
+    optionsMenu->addAction(perferenceseAction);
+}
+
+void QCM_Window::createToolBar()
+{
+    fileToolBar = addToolBar(tr("&File"));
+    editToolBar = addToolBar(tr("&Edit"));
+    toolToolBar = addToolBar(tr("&Tool"));
+    optionsToolBar = addToolBar(tr("&Options"));
+    helpToolBar = addToolBar(tr("&Help"));
+
+    fileToolBar->addAction(exitAction);
+
+    editToolBar->addAction(addLineAction);
+    editToolBar->addAction(deleteLinesAction);
+    editToolBar->addAction(escAction);
+
+    optionsToolBar->addAction(perferenceseAction);
+}
+
+void QCM_Window::addLine()
+{
+    m_view->setLink(true);
+}
+
+void QCM_Window::perferencese()
+{
+    PerferencesDialog *dialog = new PerferencesDialog((int)m_scene->parperSize().type);
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        m_scene->setParperSize(QCM::DefaultPapers[dialog->parperSize()][0]);
+    }
+}
+
+void QCM_Window::esc()
+{
+    m_view->setLink(false);
 }

@@ -5,7 +5,7 @@
 #include <frmrealtimedata.h>
 #include <QMetaEnum>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(int argc, char *argv[], QWidget *parent)
     : QWidget(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -13,11 +13,16 @@ MainWindow::MainWindow(QWidget *parent)
     initForm();
     initNav();
     initIcon();
+
+    m_lua = new QCM_Lua(argc, argv);
+    m_lua->start();
+
     // ui->stackedWidget->addWidget(new frmRealtimeData);
 }
 
 MainWindow::~MainWindow()
 {
+    delete m_lua;
     delete ui;
 }
 

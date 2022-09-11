@@ -8,6 +8,17 @@ QCM_Scene::QCM_Scene(QObject *parent) : QGraphicsScene(parent)
 
     connect(copyAction, SIGNAL(triggered()), this, SLOT(copyModelEvent()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteModelEvent()));
+
+    QCM_Node *node1, *node2;
+    node1 = new QCM_Node();
+    node2 = new QCM_Node();
+    m_preLine = new QCM_PreLine(node1, node2);
+    addItem(m_preLine);
+    addItem(node1);
+    addItem(node2);
+    m_preLine->hide();
+    node1->hide();
+    node2->hide();
 }
 
 void QCM_Scene::drawBackground(QPainter *painter, const QRectF &rect)
@@ -80,5 +91,57 @@ void QCM_Scene::deleteModelEvent(void)
         QCModel *model = (QCModel *)items.at(0);
         qDebug() << "Del" << QString::number(model->ID());
         removeItem(model);
+    }
+}
+
+void QCM_Scene::linkMove(bool v, QPointF pos)
+{
+    if (v)
+    {
+        if (!m_preLine->isVisible() && m_linkCnt != 0)
+        {
+            m_preLine->show();
+            m_preLine->sourceNode()->show();
+            m_preLine->destNode()->show();
+        }
+        m_preLine->destNode()->setPos(pos);
+    }
+    else
+    {
+        if (m_preLine->isVisible())
+        {
+            m_preLine->hide();
+            m_preLine->sourceNode()->hide();
+            m_preLine->destNode()->hide();
+        }
+        m_linkCnt = 0;
+    }
+}
+
+void QCM_Scene::linkClicked()
+{
+    if (m_linkCnt == 0)
+    {
+        m_lines.append(new QCM_NodeLine(this));
+    }
+    QCM_Node *node = new QCM_Node(m_preLine->destNode()->pos());
+    m_lines.last()->addNode(node);
+    m_linkCnt++;
+    m_preLine->sourceNode()->setPos(m_preLine->destNode()->pos());
+}
+
+void QCM_Scene::deleteLines()
+{
+    foreach (auto line, m_lines)
+    {
+        qDebug() << "remove line";
+        foreach (auto node, line->nodes())
+        {
+            if (node->isSelected())
+            {
+                line->removeNode(node);
+                qDebug() << "remove node";
+            }
+        }
     }
 }
