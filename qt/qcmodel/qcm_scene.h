@@ -21,14 +21,14 @@ public:
     QCM::PaperSize_s parperSize(void) const { return m_parperSize; }
 
     QCM_PreLine *preLine() const { return m_preLine; }
-    void linkClicked();
-    void linkMove(bool, QPointF);
+    void addLinkClicked();
+    void addLinkMove(bool, QPointF);
 
 private:
     QCM::PaperSize_s m_parperSize = QCM::A4Paper;
     QMenu m_menu;
     QCM_PreLine *m_preLine;
-    QList<QCM_NodeLine *> m_lines;
+    QList<QCM_NodeLine *> m_nodeLines;
     int m_linkCnt = 0;
 
     void drawBackground(QPainter *painter, const QRectF &rect);

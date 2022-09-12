@@ -36,7 +36,7 @@ void QCM_View::mousePressEvent(QMouseEvent *event)
     {
         if (m_isSetLink)
         {
-            ((QCM_Scene *)scene())->linkClicked();
+            ((QCM_Scene *)scene())->addLinkClicked();
         }
     }
 }
@@ -61,7 +61,7 @@ void QCM_View::mouseMoveEvent(QMouseEvent *event)
         // posAnchor是MyGraphicsView的私有成员变量，用以记录每次的事件结束时候的鼠标位置
         posAnchor = event->pos();
     }
-    ((QCM_Scene *)scene())->linkMove(m_isSetLink, mapToScene(event->pos()));
+    ((QCM_Scene *)scene())->addLinkMove(m_isSetLink, mapToScene(event->pos()));
     emit posChanged(mapToScene(event->pos()));
 }
 

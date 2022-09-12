@@ -131,7 +131,7 @@ void QCM_Line::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void QCM_PreLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if (!sourceNode() || !destNode())
+    if (!fromNode() || !toNode())
         return;
 
     QLineF line(sourcePoint(), destPoint());

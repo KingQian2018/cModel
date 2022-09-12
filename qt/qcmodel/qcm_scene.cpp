@@ -94,54 +94,94 @@ void QCM_Scene::deleteModelEvent(void)
     }
 }
 
-void QCM_Scene::linkMove(bool v, QPointF pos)
+void QCM_Scene::addLinkMove(bool v, QPointF pos)
 {
     if (v)
     {
         if (!m_preLine->isVisible() && m_linkCnt != 0)
         {
             m_preLine->show();
-            m_preLine->sourceNode()->show();
-            m_preLine->destNode()->show();
+            m_preLine->fromNode()->show();
+            m_preLine->toNode()->show();
         }
-        m_preLine->destNode()->setPos(pos);
+        m_preLine->toNode()->setPos(pos);
     }
     else
     {
         if (m_preLine->isVisible())
         {
             m_preLine->hide();
-            m_preLine->sourceNode()->hide();
-            m_preLine->destNode()->hide();
+            m_preLine->fromNode()->hide();
+            m_preLine->toNode()->hide();
         }
         m_linkCnt = 0;
     }
 }
 
-void QCM_Scene::linkClicked()
+void QCM_Scene::addLinkClicked()
 {
-    if (m_linkCnt == 0)
+    QCM_Node *_node = new QCM_Node(m_preLine->toNode()->pos());
+    QCM_NodeLine *_nodeLine = NULL;
+    bool isAddNode = true;
+    foreach (auto nodeLine, m_nodeLines)
     {
-        m_lines.append(new QCM_NodeLine(this));
+        foreach (auto n, nodeLine->nodes())
+        {
+            if (n->collidesWithItem(_node))
+            {
+                delete _node;
+                _node = n;
+                _nodeLine = nodeLine;
+                isAddNode = false;
+                goto over;
+            }
+        }
+        if (_nodeLine == NULL)
+        {
+            foreach (auto l, nodeLine->lines())
+            {
+                if (l->collidesWithItem(_node))
+                {
+                    nodeLine->addNodeOnLine(_node, l);
+                    _nodeLine = nodeLine;
+                }
+            }
+        }
     }
-    QCM_Node *node = new QCM_Node(m_preLine->destNode()->pos());
-    m_lines.last()->addNode(node);
+    if (m_linkCnt == 0 && _nodeLine == NULL)
+    {
+        _nodeLine = new QCM_NodeLine(this);
+        m_nodeLines.append(_nodeLine);
+    }
+    if (_nodeLine == NULL)
+    {
+        _nodeLine = m_nodeLines.last();
+    }
+over:
+    _nodeLine->addNode(_node, isAddNode);
     m_linkCnt++;
-    m_preLine->sourceNode()->setPos(m_preLine->destNode()->pos());
+    m_preLine->fromNode()->setPos(m_preLine->toNode()->pos());
 }
 
 void QCM_Scene::deleteLines()
 {
-    foreach (auto line, m_lines)
+    qDebug() << QString("before move m_nodeLines: %1")
+                    .arg(m_nodeLines.count());
+    foreach (auto nodeLine, m_nodeLines)
     {
-        qDebug() << "remove line";
-        foreach (auto node, line->nodes())
+        foreach (auto line, nodeLine->lines())
         {
-            if (node->isSelected())
+            if (line->isSelected())
             {
-                line->removeNode(node);
-                qDebug() << "remove node";
+                nodeLine->removeLine(line);
             }
         }
+        if (nodeLine->lines().count() == 0)
+        {
+            m_nodeLines.removeOne(nodeLine);
+            delete nodeLine;
+        }
     }
+    qDebug() << QString("after move m_nodeLines: %1")
+                    .arg(m_nodeLines.count());
 }

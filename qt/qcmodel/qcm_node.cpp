@@ -45,6 +45,13 @@ void QCM_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->setPen(pen);
         painter->drawPoint(0, 0);
     }
+    else
+    {
+        QPen pen(Qt::blue);
+        pen.setWidth(4);
+        painter->setPen(pen);
+        painter->drawPoint(0, 0);
+    }
 }
 
 void QCM_Node::setRect(const QRectF &rect)

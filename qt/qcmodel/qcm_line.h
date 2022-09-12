@@ -18,8 +18,18 @@ public:
     };
     int type() const override { return Type; }
     void trackNodes();
-    QCM_Node *sourceNode() const { return m_fromNode; }
-    QCM_Node *destNode() const { return m_toNode; }
+    QCM_Node *fromNode() const { return m_fromNode; }
+    QCM_Node *toNode() const { return m_toNode; }
+    void setFromNode(QCM_Node *const node)
+    {
+        m_fromNode = node;
+        trackNodes();
+    }
+    void setToNode(QCM_Node *const node)
+    {
+        m_toNode = node;
+        trackNodes();
+    }
 
 protected:
     QRectF boundingRect() const;
