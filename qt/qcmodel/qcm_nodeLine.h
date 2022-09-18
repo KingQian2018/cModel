@@ -10,10 +10,9 @@ public:
     QCM_NodeLine(QGraphicsScene *scene);
     ~QCM_NodeLine();
 
-    inline void addNode(QCM_Node *node);
-    void addNode(QCM_Node *node, bool isAddNode);
+    void addNode(QCM_Node *node);
     void addNodeOnLine(QCM_Node *node, QCM_Line *line);
-    void removeLine(QCM_Line *const line);
+    void removeLine(QCM_Line *line);
     QList<QCM_Node *> nodes() const { return m_nodes; }
     QList<QCM_Line *> lines() const { return m_lines; }
 
@@ -22,7 +21,8 @@ private:
     QList<QCM_Line *> m_lines;
     QGraphicsScene *m_scene;
 
-    void removeNode(QCM_Node *const node);
+    void removeNode(QCM_Node *node);
+    void removeNodeOnLine(QCM_Node *node);
 };
 
 #endif

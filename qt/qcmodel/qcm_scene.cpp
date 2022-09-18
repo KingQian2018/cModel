@@ -122,7 +122,6 @@ void QCM_Scene::addLinkClicked()
 {
     QCM_Node *_node = new QCM_Node(m_preLine->toNode()->pos());
     QCM_NodeLine *_nodeLine = NULL;
-    bool isAddNode = true;
     foreach (auto nodeLine, m_nodeLines)
     {
         foreach (auto n, nodeLine->nodes())
@@ -132,7 +131,6 @@ void QCM_Scene::addLinkClicked()
                 delete _node;
                 _node = n;
                 _nodeLine = nodeLine;
-                isAddNode = false;
                 goto over;
             }
         }
@@ -158,7 +156,7 @@ void QCM_Scene::addLinkClicked()
         _nodeLine = m_nodeLines.last();
     }
 over:
-    _nodeLine->addNode(_node, isAddNode);
+    _nodeLine->addNode(_node);
     m_linkCnt++;
     m_preLine->fromNode()->setPos(m_preLine->toNode()->pos());
 }
@@ -180,6 +178,7 @@ void QCM_Scene::deleteLines()
         {
             m_nodeLines.removeOne(nodeLine);
             delete nodeLine;
+            nodeLine = NULL;
         }
     }
     qDebug() << QString("after move m_nodeLines: %1")

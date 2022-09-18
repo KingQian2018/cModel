@@ -27,7 +27,9 @@ QCM_Line::QCM_Line(QCM_Node *sourceNode, QCM_Node *destNode)
 QCM_Line::~QCM_Line()
 {
     m_fromNode->removeLine(this);
+    m_fromNode->update();
     m_toNode->removeLine(this);
+    m_toNode->update();
 }
 
 void QCM_Line::trackNodes()

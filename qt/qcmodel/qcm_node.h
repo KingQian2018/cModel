@@ -16,7 +16,7 @@ public:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
     QPainterPath shape() const;
-    QSet<QCM_Line *> lines() const { return m_lines; }
+    QList<QCM_Line *> lines() const { return m_lines; }
     enum
     {
         Type = UserType + QCM::NODE
@@ -33,7 +33,7 @@ protected:
 
 private:
     QRectF m_rect;
-    QSet<QCM_Line *> m_lines;
+    QList<QCM_Line *> m_lines;
 
     void setRect(const QRectF &rect);
     void init();

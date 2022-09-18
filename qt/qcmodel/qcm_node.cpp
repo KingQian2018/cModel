@@ -20,6 +20,7 @@ QCM_Node::~QCM_Node()
     foreach (QCM_Line *line, m_lines)
     {
         delete line;
+        line = NULL;
     }
 }
 
@@ -82,7 +83,7 @@ QVariant QCM_Node::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void QCM_Node::addLine(QCM_Line *line) { m_lines << line; }
 
-void QCM_Node::removeLine(QCM_Line *line) { m_lines.remove(line); }
+void QCM_Node::removeLine(QCM_Line *line) { m_lines.removeOne(line); }
 
 QPainterPath QCM_Node::shape() const
 {
